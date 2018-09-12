@@ -20,12 +20,15 @@ import android.view.ViewGroup;
 import com.vietdung.beautymusic.R;
 import com.vietdung.beautymusic.adapter.SongAdapter;
 import com.vietdung.beautymusic.model.Songs;
+import com.vietdung.beautymusic.presenter.PresenterImpFragmentSong;
+import com.vietdung.beautymusic.presenter.PresenterLogicFragmentSong;
+import com.vietdung.beautymusic.presenter.ViewFragmentSong;
 import com.vietdung.beautymusic.until.MusicService;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FragmentSongs extends Fragment {
+public class FragmentSongs extends Fragment implements ViewFragmentSong {
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
     // private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = ;
     RecyclerView rv_Songs;
@@ -40,6 +43,7 @@ public class FragmentSongs extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_songs, container, false);
         rv_Songs = view.findViewById(R.id.rvSongs);
+        //PresenterLogicFragmentSong presenterLogicFragmentSong = new PresenterLogicFragmentSong((PresenterImpFragmentSong) this,getActivity());
         songsList = new ArrayList<>();
         songAdapter = new SongAdapter(songsList, getActivity());
         getData();
@@ -66,8 +70,8 @@ public class FragmentSongs extends Fragment {
 
 
 
-    private void getData() {
-        songAdapter.notifyDataSetChanged();
+    public void getData() {
+        //songAdapter.notifyDataSetChanged();
         ContentResolver cr = getActivity().getContentResolver();
         Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         Cursor musicCursor = cr.query(musicUri, null, null, null, null);
@@ -80,16 +84,26 @@ public class FragmentSongs extends Fragment {
                     (MediaStore.Audio.Media._ID);
             int artistColumn = musicCursor.getColumnIndex
                     (MediaStore.Audio.Media.ARTIST);
+            int albumsColums = musicCursor.getColumnIndex
+                    (MediaStore.Audio.Media.ALBUM_ID);
+
             //add songs to list
             do {
                 int thisId = musicCursor.getInt(idColumn);
                 String thisTitle = musicCursor.getString(titleColumn);
                 String thisArtist = musicCursor.getString(artistColumn);
-                songsList.add(new Songs(thisId, thisTitle, thisArtist));
+                int idALbums= musicCursor.getInt(albumsColums);
+                songsList.add(new Songs(thisId, thisTitle, thisArtist,idALbums));
+
             }
             while (musicCursor.moveToNext());
         }
 
+
+    }
+
+    @Override
+    public void displayList() {
 
     }
 

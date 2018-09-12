@@ -14,10 +14,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.AdapterView;
@@ -28,6 +25,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.vietdung.beautymusic.R;
+import com.vietdung.beautymusic.adapter.AlbumsAdapter;
 import com.vietdung.beautymusic.adapter.SongAdapter;
 import com.vietdung.beautymusic.adapter.SongAlbumAdapter;
 import com.vietdung.beautymusic.adapter.SongMusicAdapter;
@@ -70,7 +68,7 @@ public class PlayMussic extends AppCompatActivity {
         if (playIntent == null) {
             playIntent = new Intent(this, MusicService.class);
             bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
-            //startService(playIntent);
+            startService(playIntent);
         }
         initView();
         addEvents();
@@ -195,34 +193,73 @@ public class PlayMussic extends AppCompatActivity {
         if (position < songsList.size()) {
             position = getIntent().getIntExtra(SongAdapter.rq_itent_position, 0);
             id = getIntent().getIntExtra(SongAdapter.rq_itent_id, 0);
-            Log.d("ID", " " + position + " " + id);
+            //  Log.d("ID", " " + position + " " + id);
         }
 
     }
 
     private void getSonglist() {
-        ContentResolver cr = getContentResolver();
-        Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        Cursor musicCursor = cr.query(musicUri, null, null, null, null);
+        int screen = getIntent().getIntExtra(SongAdapter.rq_itent_screen,-1);
+        // getSong full
+        if(screen==111){
+            ContentResolver cr = getContentResolver();
+            Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+            Cursor musicCursor = cr.query(musicUri, null, null, null, null);
 
-        if (musicCursor != null && musicCursor.moveToFirst()) {
-            //get columns
-            int titleColumn = musicCursor.getColumnIndex
-                    (android.provider.MediaStore.Audio.Media.TITLE);
-            int idColumn = musicCursor.getColumnIndex
-                    (android.provider.MediaStore.Audio.Media._ID);
-            int artistColumn = musicCursor.getColumnIndex
-                    (android.provider.MediaStore.Audio.Media.ARTIST);
-            //add songs to list
-            do {
-                int thisId = musicCursor.getInt(idColumn);
-                String thisTitle = musicCursor.getString(titleColumn);
-                String thisArtist = musicCursor.getString(artistColumn);
-                songsList.add(new Songs(thisId, thisTitle, thisArtist));
+            if (musicCursor != null && musicCursor.moveToFirst()) {
+                //get columns
+                int titleColumn = musicCursor.getColumnIndex
+                        (android.provider.MediaStore.Audio.Media.TITLE);
+                int idColumn = musicCursor.getColumnIndex
+                        (android.provider.MediaStore.Audio.Media._ID);
+                int artistColumn = musicCursor.getColumnIndex
+                        (android.provider.MediaStore.Audio.Media.ARTIST);
+                int albumsColums = musicCursor.getColumnIndex
+                        (MediaStore.Audio.Media.ALBUM_ID);
+                //add songs to list
+                do {
+                    int thisId = musicCursor.getInt(idColumn);
+                    String thisTitle = musicCursor.getString(titleColumn);
+                    String thisArtist = musicCursor.getString(artistColumn);
+                    int idALbums= musicCursor.getInt(albumsColums);
+                    songsList.add(new Songs(thisId, thisTitle, thisArtist,idALbums));
+                }
+                while (musicCursor.moveToNext());
             }
-            while (musicCursor.moveToNext());
+            songAdapter.notifyDataSetChanged();
+        }// getSong Album
+        else if(screen==123){
+            int idAlbums = getIntent().getIntExtra(SongMusicAdapter.rq_itent_album,-1);
+            ContentResolver cr = getContentResolver();
+            Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+            Cursor musicCursor = cr.query(musicUri, null, null, null, null);
+
+            if (musicCursor != null && musicCursor.moveToFirst()) {
+                //get columns
+                int titleColumn = musicCursor.getColumnIndex
+                        (android.provider.MediaStore.Audio.Media.TITLE);
+                int idColumn = musicCursor.getColumnIndex
+                        (android.provider.MediaStore.Audio.Media._ID);
+                int artistColumn = musicCursor.getColumnIndex
+                        (android.provider.MediaStore.Audio.Media.ARTIST);
+                int albumsColums = musicCursor.getColumnIndex
+                        (MediaStore.Audio.Media.ALBUM_ID);
+                //add songs to list
+                do {
+                    int thisAlbums = musicCursor.getInt(albumsColums);
+                    if (thisAlbums == idAlbums) {
+                        int thisId = musicCursor.getInt(idColumn);
+                        String thisTitle = musicCursor.getString(titleColumn);
+                        String thisArtist = musicCursor.getString(artistColumn);
+                        songsList.add(new Songs(thisId, thisTitle, thisArtist,idAlbums));
+                    }
+                }
+                while (musicCursor.moveToNext());
+            }
+
+            songAdapter.notifyDataSetChanged();
         }
-        songAdapter.notifyDataSetChanged();
+
     }
 
     private void setToolbar() {
@@ -241,7 +278,7 @@ public class PlayMussic extends AppCompatActivity {
 
     }
 
-    private void updateTimeSong(){
+    private void updateTimeSong() {
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -257,9 +294,9 @@ public class PlayMussic extends AppCompatActivity {
                 }
 
 
-                handler.postDelayed(this,500);
+                handler.postDelayed(this, 500);
             }
-        },100);
+        }, 100);
     }
 
     private void initView() {

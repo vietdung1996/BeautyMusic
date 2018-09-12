@@ -23,16 +23,15 @@ public class SongMusicAdapter extends RecyclerView.Adapter<SongMusicAdapter.Recy
     private List<Songs> songsList;
     List<Albums>albumsList;
     Activity context;
-    int idAlbums;
     //MusicService musicService;
-    public static String rq_itent_album="hello";
+    public static String rq_itent_album="123456";
 //    public static String rq_itent_position="xyz";
 
     public SongMusicAdapter(List<Songs> songsList, Activity context,int idAlbums) {
         this.songsList = songsList;
         this.context = context;
         this.albumsList = albumsList;
-        this.idAlbums = idAlbums;
+       // this.idAlbums = idAlbums;
        // this.musicService =musicService;
     }
 
@@ -56,7 +55,8 @@ public class SongMusicAdapter extends RecyclerView.Adapter<SongMusicAdapter.Recy
                 Intent i = new Intent(context,PlayMussic.class);
                 i.putExtra(SongAdapter.rq_itent_id,songsList.get(position).getId());
                 i.putExtra(SongAdapter.rq_itent_position,position);
-                i.putExtra(rq_itent_album,idAlbums);
+                i.putExtra(rq_itent_album,songsList.get(position).getIdAlbums());
+                i.putExtra(SongAdapter.rq_itent_screen,123);
                 context.startActivity(i);
             }
         });

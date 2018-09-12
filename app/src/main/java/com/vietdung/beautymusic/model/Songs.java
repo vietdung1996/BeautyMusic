@@ -5,11 +5,21 @@ public class Songs {
     private String nameSong;
     private String nameAuthor ;
     private String albums;
+    private int idAlbums;
 
-    public Songs(int id, String nameSong, String nameAuthor) {
+    public Songs(int id, String nameSong, String nameAuthor,int idAlbums) {
         this.id = id;
         this.nameSong = nameSong;
         this.nameAuthor = nameAuthor;
+        this.idAlbums = idAlbums;
+    }
+
+    public int getIdAlbums() {
+        return idAlbums;
+    }
+
+    public void setIdAlbums(int idAlbums) {
+        this.idAlbums = idAlbums;
     }
 
     public int getId() {

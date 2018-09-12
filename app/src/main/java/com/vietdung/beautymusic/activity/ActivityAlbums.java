@@ -36,11 +36,11 @@ public class ActivityAlbums extends AppCompatActivity {
     SongMusicAdapter songMusicAdapter;
     MusicService musicService;
 
-    int idAlbums=0;
+    int idAlbums = 0;
     String thisTitle = "";
     String thisArtist = "";
     String thisArt = "";
-    String thisIdAlbums="";
+    String thisIdAlbums = "";
 
 
     @Override
@@ -59,7 +59,7 @@ public class ActivityAlbums extends AppCompatActivity {
         setToolbar();
     }
 
-
+    // getAlbum from sdcard
     private void getAlbums() {
         idAlbums = getIntent().getIntExtra(AlbumsAdapter.idALbums, 0);
         ContentResolver cr = getApplication().getContentResolver();
@@ -92,6 +92,7 @@ public class ActivityAlbums extends AppCompatActivity {
         }
     }
 
+    // getSong on Album
     private void getSongAlbums() {
         ContentResolver cr = getContentResolver();
         Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
@@ -114,7 +115,7 @@ public class ActivityAlbums extends AppCompatActivity {
                     int thisId = musicCursor.getInt(idColumn);
                     String thisTitle = musicCursor.getString(titleColumn);
                     String thisArtist = musicCursor.getString(artistColumn);
-                    songsList.add(new Songs(thisId, thisTitle, thisArtist));
+                    songsList.add(new Songs(thisId, thisTitle, thisArtist,idAlbums));
                 }
             }
             while (musicCursor.moveToNext());
@@ -140,8 +141,6 @@ public class ActivityAlbums extends AppCompatActivity {
     }
 
 
-
-
     private void initView() {
         tb_Albums = findViewById(R.id.tbAlbums);
         iv_Albums = findViewById(R.id.ivActivityAlbums);
@@ -149,7 +148,7 @@ public class ActivityAlbums extends AppCompatActivity {
         rv_Albums = findViewById(R.id.rvAlbums);
         songsList = new ArrayList<>();
         albumsList = new ArrayList<>();
-        songMusicAdapter = new SongMusicAdapter(songsList, this,idAlbums);
+        songMusicAdapter = new SongMusicAdapter(songsList, this, idAlbums);
         songMusicAdapter.notifyDataSetChanged();
         rv_Albums.setAdapter(songMusicAdapter);
         rv_Albums.setLayoutManager(new LinearLayoutManager(this));

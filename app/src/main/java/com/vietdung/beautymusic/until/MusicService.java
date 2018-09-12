@@ -9,6 +9,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.provider.MediaStore;
@@ -29,7 +30,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     List<Songs> songsList;
     int position;
     private final IBinder musicBind = new MusicBinder();
-    private String songTitle = "";
+    //private String songTitle = "";
     private static final int NOTIFY_ID = 1;
 
     @Nullable
@@ -48,6 +49,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         super.onCreate();
         position = 0;
         mediaPlayer = new MediaPlayer();
+        //playSong();
         initMusicPlay();
     }
 
@@ -177,14 +179,17 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         i.putExtra(SongAdapter.rq_itent_position,position);
         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), (int) System.currentTimeMillis(), i, PendingIntent.FLAG_UPDATE_CURRENT);
         Notification.Builder builder = new Notification.Builder(this);
-        builder.setContentTitle(songsList.get(position).getNameSong())
-                .setContentText(songsList.get(position).getNameAuthor())
-                .setSmallIcon(R.drawable.music)
-                .setContentIntent(pendingIntent)
-                //.setAutoCancel(true)
-                .addAction(R.drawable.back, "Back",pendingIntent)
-                .addAction(R.drawable.pause, "Pause", pendingIntent)
-                .addAction(R.drawable.next, "Next", pendingIntent).build();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder.setContentTitle(songsList.get(position).getNameSong())
+                    .setVisibility(Notification.VISIBILITY_PUBLIC)
+                    .setContentText(songsList.get(position).getNameAuthor())
+                    .setSmallIcon(R.drawable.music)
+                    .setContentIntent(pendingIntent)
+                    //.setAutoCancel(true)
+                    .addAction(R.drawable.back, "Back",pendingIntent)
+                    .addAction(R.drawable.pause, "Pause", pendingIntent)
+                    .addAction(R.drawable.next, "Next", pendingIntent).build();
+        }
         Notification not = builder.build();
         startForeground(NOTIFY_ID, not);
     }

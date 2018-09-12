@@ -47,6 +47,7 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.Recyclervi
             public void onClick(View view) {
                 Intent intent = new Intent(context, ActivityAlbums.class);
                 intent.putExtra(idALbums,albumsList.get(position).getId());
+                intent.putExtra(SongAdapter.rq_itent_screen,123);
                 context.startActivity(intent);
             }
         });
