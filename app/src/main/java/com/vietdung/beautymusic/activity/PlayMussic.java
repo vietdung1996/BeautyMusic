@@ -25,10 +25,9 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.vietdung.beautymusic.R;
-import com.vietdung.beautymusic.adapter.AlbumsAdapter;
 import com.vietdung.beautymusic.adapter.SongAdapter;
-import com.vietdung.beautymusic.adapter.SongAlbumAdapter;
-import com.vietdung.beautymusic.adapter.SongMusicAdapter;
+import com.vietdung.beautymusic.adapter.SongAlbum1Adapter;
+import com.vietdung.beautymusic.adapter.SongMusic1Adapter;
 import com.vietdung.beautymusic.model.Songs;
 import com.vietdung.beautymusic.until.MusicService;
 
@@ -50,7 +49,7 @@ public class PlayMussic extends AppCompatActivity {
     ImageView iv_Repeat, iv_Suffle;
     Toolbar tb_PlayMusic;
     List<Songs> songsList;
-    SongAlbumAdapter songAdapter;
+    SongMusic1Adapter songAdapter;
     ListView rv_Song;
     int id = 0;
     MusicService musicService;
@@ -73,6 +72,12 @@ public class PlayMussic extends AppCompatActivity {
         initView();
         addEvents();
 
+    }
+
+    @Override
+    protected void onStop() {
+        //musicService.unbindService(musicConnection);
+        super.onStop();
     }
 
     private ServiceConnection musicConnection = new ServiceConnection() {
@@ -105,6 +110,7 @@ public class PlayMussic extends AppCompatActivity {
     protected void onDestroy() {
         stopService(playIntent);
         musicService = null;
+        unbindService(musicConnection);
         super.onDestroy();
     }
 
@@ -171,10 +177,7 @@ public class PlayMussic extends AppCompatActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                musicService.seekTo(seekBar.getProgress()
-
-
-                );
+                musicService.seekTo(seekBar.getProgress());
 
             }
         });
@@ -199,9 +202,9 @@ public class PlayMussic extends AppCompatActivity {
     }
 
     private void getSonglist() {
-        int screen = getIntent().getIntExtra(SongAdapter.rq_itent_screen,-1);
+        int screen = getIntent().getIntExtra(SongAdapter.rq_itent_screen, -1);
         // getSong full
-        if(screen==111){
+        if (screen == 111) {
             ContentResolver cr = getContentResolver();
             Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
             Cursor musicCursor = cr.query(musicUri, null, null, null, null);
@@ -221,15 +224,15 @@ public class PlayMussic extends AppCompatActivity {
                     int thisId = musicCursor.getInt(idColumn);
                     String thisTitle = musicCursor.getString(titleColumn);
                     String thisArtist = musicCursor.getString(artistColumn);
-                    int idALbums= musicCursor.getInt(albumsColums);
-                    songsList.add(new Songs(thisId, thisTitle, thisArtist,idALbums));
+                    int idALbums = musicCursor.getInt(albumsColums);
+                    songsList.add(new Songs(thisId, thisTitle, thisArtist, idALbums));
                 }
                 while (musicCursor.moveToNext());
             }
             songAdapter.notifyDataSetChanged();
         }// getSong Album
-        else if(screen==123){
-            int idAlbums = getIntent().getIntExtra(SongMusicAdapter.rq_itent_album,-1);
+        else if (screen == 123) {
+            int idAlbums = getIntent().getIntExtra(SongAlbum1Adapter.rq_itent_album, -1);
             ContentResolver cr = getContentResolver();
             Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
             Cursor musicCursor = cr.query(musicUri, null, null, null, null);
@@ -251,12 +254,38 @@ public class PlayMussic extends AppCompatActivity {
                         int thisId = musicCursor.getInt(idColumn);
                         String thisTitle = musicCursor.getString(titleColumn);
                         String thisArtist = musicCursor.getString(artistColumn);
-                        songsList.add(new Songs(thisId, thisTitle, thisArtist,idAlbums));
+                        songsList.add(new Songs(thisId, thisTitle, thisArtist, idAlbums));
                     }
                 }
                 while (musicCursor.moveToNext());
             }
 
+            songAdapter.notifyDataSetChanged();
+        } else {
+            ContentResolver cr = getContentResolver();
+            Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+            Cursor musicCursor = cr.query(musicUri, null, null, null, null);
+
+            if (musicCursor != null && musicCursor.moveToFirst()) {
+                //get columns
+                int titleColumn = musicCursor.getColumnIndex
+                        (android.provider.MediaStore.Audio.Media.TITLE);
+                int idColumn = musicCursor.getColumnIndex
+                        (android.provider.MediaStore.Audio.Media._ID);
+                int artistColumn = musicCursor.getColumnIndex
+                        (android.provider.MediaStore.Audio.Media.ARTIST);
+                int albumsColums = musicCursor.getColumnIndex
+                        (MediaStore.Audio.Media.ALBUM_ID);
+                //add songs to list
+                do {
+                    int thisId = musicCursor.getInt(idColumn);
+                    String thisTitle = musicCursor.getString(titleColumn);
+                    String thisArtist = musicCursor.getString(artistColumn);
+                    int idALbums = musicCursor.getInt(albumsColums);
+                    songsList.add(new Songs(thisId, thisTitle, thisArtist, idALbums));
+                }
+                while (musicCursor.moveToNext());
+            }
             songAdapter.notifyDataSetChanged();
         }
 
@@ -315,7 +344,7 @@ public class PlayMussic extends AppCompatActivity {
         seekBar = findViewById(R.id.seekbar);
         musicService = new MusicService();
         songsList = new ArrayList<>();
-        songAdapter = new SongAlbumAdapter(songsList, this);
+        songAdapter = new SongMusic1Adapter(songsList, this);
         rv_Song.setAdapter(songAdapter);
         animator = ObjectAnimator.ofFloat(iv_CircleMussic, "rotation", 0f, 360f);
         animator.setDuration(10000);

@@ -13,12 +13,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.widget.ImageView;
 
 import com.vietdung.beautymusic.R;
 import com.vietdung.beautymusic.adapter.AlbumsAdapter;
-import com.vietdung.beautymusic.adapter.SongMusicAdapter;
+import com.vietdung.beautymusic.adapter.SongAlbum1Adapter;
 import com.vietdung.beautymusic.model.Albums;
 import com.vietdung.beautymusic.model.Songs;
 import com.vietdung.beautymusic.until.MusicService;
@@ -33,7 +32,7 @@ public class ActivityAlbums extends AppCompatActivity {
     RecyclerView rv_Albums;
     List<Songs> songsList;
     List<Albums> albumsList;
-    SongMusicAdapter songMusicAdapter;
+    SongAlbum1Adapter songMusicAdapter;
     MusicService musicService;
 
     int idAlbums = 0;
@@ -148,7 +147,7 @@ public class ActivityAlbums extends AppCompatActivity {
         rv_Albums = findViewById(R.id.rvAlbums);
         songsList = new ArrayList<>();
         albumsList = new ArrayList<>();
-        songMusicAdapter = new SongMusicAdapter(songsList, this, idAlbums);
+        songMusicAdapter = new SongAlbum1Adapter(songsList, this, idAlbums);
         songMusicAdapter.notifyDataSetChanged();
         rv_Albums.setAdapter(songMusicAdapter);
         rv_Albums.setLayoutManager(new LinearLayoutManager(this));

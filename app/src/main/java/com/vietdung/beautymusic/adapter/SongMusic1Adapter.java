@@ -14,11 +14,11 @@ import com.vietdung.beautymusic.model.Songs;
 
 import java.util.List;
 
-public class SongAlbumAdapter extends BaseAdapter {
+public class SongMusic1Adapter extends BaseAdapter {
     List<Songs>songsList;
     Context context;
 
-    public SongAlbumAdapter(List<Songs> songsList,  Context context) {
+    public SongMusic1Adapter(List<Songs> songsList, Context context) {
         this.songsList = songsList;
         this.context =context;
     }

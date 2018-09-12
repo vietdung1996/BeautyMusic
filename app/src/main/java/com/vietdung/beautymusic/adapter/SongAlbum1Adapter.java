@@ -1,7 +1,6 @@
 package com.vietdung.beautymusic.adapter;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -15,11 +14,10 @@ import com.vietdung.beautymusic.R;
 import com.vietdung.beautymusic.activity.PlayMussic;
 import com.vietdung.beautymusic.model.Albums;
 import com.vietdung.beautymusic.model.Songs;
-import com.vietdung.beautymusic.until.MusicService;
 
 import java.util.List;
 
-public class SongMusicAdapter extends RecyclerView.Adapter<SongMusicAdapter.RecyclerviewHolder> {
+public class SongAlbum1Adapter extends RecyclerView.Adapter<SongAlbum1Adapter.RecyclerviewHolder> {
     private List<Songs> songsList;
     List<Albums>albumsList;
     Activity context;
@@ -27,7 +25,7 @@ public class SongMusicAdapter extends RecyclerView.Adapter<SongMusicAdapter.Recy
     public static String rq_itent_album="123456";
 //    public static String rq_itent_position="xyz";
 
-    public SongMusicAdapter(List<Songs> songsList, Activity context,int idAlbums) {
+    public SongAlbum1Adapter(List<Songs> songsList, Activity context, int idAlbums) {
         this.songsList = songsList;
         this.context = context;
         this.albumsList = albumsList;
@@ -37,14 +35,14 @@ public class SongMusicAdapter extends RecyclerView.Adapter<SongMusicAdapter.Recy
 
     @NonNull
     @Override
-    public SongMusicAdapter.RecyclerviewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public SongAlbum1Adapter.RecyclerviewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.custom_songs, parent, false);
-        return new SongMusicAdapter.RecyclerviewHolder(view);
+        return new SongAlbum1Adapter.RecyclerviewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull SongMusicAdapter.RecyclerviewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull SongAlbum1Adapter.RecyclerviewHolder holder, final int position) {
         holder.tv_NameSong.setText(songsList.get(position).getNameSong());
         holder.tv_NameAuthor.setText(songsList.get(position).getNameAuthor());
         holder.itemView.setOnClickListener(new View.OnClickListener() {

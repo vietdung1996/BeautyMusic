@@ -40,17 +40,32 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        return super.onStartCommand(intent, flags, startId);
-    }
-
-    @Override
     public void onCreate() {
         super.onCreate();
         position = 0;
         mediaPlayer = new MediaPlayer();
         //playSong();
         initMusicPlay();
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+
+        return false;
+    }
+
+
+    @Override
+    public void onDestroy() {
+
+        mediaPlayer.stop();
+        mediaPlayer.release();
+        super.onDestroy();
     }
 
 
@@ -84,12 +99,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         mediaPlayer.start();
     }
 
-    @Override
-    public boolean onUnbind(Intent intent) {
-        mediaPlayer.stop();
-        mediaPlayer.release();
-        return false;
-    }
+
 
     public void playSong() {
         mediaPlayer.reset();
@@ -175,8 +185,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     }
 
     public void notification() {
+
         Intent i = new Intent(getApplicationContext(), PlayMussic.class);
         i.putExtra(SongAdapter.rq_itent_position,position);
+        //i.putExtra()
         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), (int) System.currentTimeMillis(), i, PendingIntent.FLAG_UPDATE_CURRENT);
         Notification.Builder builder = new Notification.Builder(this);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -191,6 +203,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                     .addAction(R.drawable.next, "Next", pendingIntent).build();
         }
         Notification not = builder.build();
+
         startForeground(NOTIFY_ID, not);
     }
 

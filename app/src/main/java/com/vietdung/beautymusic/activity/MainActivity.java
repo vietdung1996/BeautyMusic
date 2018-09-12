@@ -144,4 +144,10 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setTabsFromPagerAdapter(adapter);//deprecated
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindService(musicConnection);
+    }
 }

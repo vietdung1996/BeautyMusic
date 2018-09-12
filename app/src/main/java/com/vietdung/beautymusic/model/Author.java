@@ -1,9 +1,9 @@
 package com.vietdung.beautymusic.model;
 
-public class Author  {
+public class Author {
     private int id;
     private String nameSong;
-    private String nameAuthor ;
+    private String nameAuthor;
 
     public Author(int id, String nameSong, String nameAuthor) {
         this.id = id;
