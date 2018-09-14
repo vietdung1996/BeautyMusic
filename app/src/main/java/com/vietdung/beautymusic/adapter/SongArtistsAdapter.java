@@ -1,8 +1,8 @@
 package com.vietdung.beautymusic.adapter;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,44 +12,50 @@ import android.widget.TextView;
 
 import com.vietdung.beautymusic.R;
 import com.vietdung.beautymusic.activity.PlayMussicActivity;
+import com.vietdung.beautymusic.model.Author;
 import com.vietdung.beautymusic.model.Songs;
 
 import java.util.List;
 
-public class SongAdapter extends RecyclerView.Adapter<SongAdapter.RecyclerviewHolder> {
+public class SongArtistsAdapter extends RecyclerView.Adapter<SongArtistsAdapter.RecyclerviewHolder> {
     private List<Songs> songsList;
-    FragmentActivity context;
-    public static String rq_itent_id = "abc";
-    public static String rq_itent_position = "xyz";
-    public static String rq_itent_screen = "1996";
+    List<Author> albumsList;
+    Activity context;
     //MusicService musicService;
+    public static String rq_itent_album = "123456";
+//    public static String rq_itent_position="xyz";
 
-    public SongAdapter(List<Songs> songsList, FragmentActivity context) {
+    public SongArtistsAdapter(List<Songs> songsList, Activity context, int idAlbums) {
         this.songsList = songsList;
         this.context = context;
+        this.albumsList = albumsList;
+        // this.idAlbums = idAlbums;
+        // this.musicService =musicService;
     }
 
     @NonNull
     @Override
-    public RecyclerviewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public SongArtistsAdapter.RecyclerviewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.custom_songs, parent, false);
-        return new RecyclerviewHolder(view);
+        return new SongArtistsAdapter.RecyclerviewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerviewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull SongArtistsAdapter.RecyclerviewHolder holder, final int position) {
         holder.tv_NameSong.setText(songsList.get(position).getNameSong());
         holder.tv_NameAuthor.setText(songsList.get(position).getNameAuthor());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(context, PlayMussicActivity.class);
-                intent.putExtra(rq_itent_id, songsList.get(position).getId());
-                intent.putExtra(rq_itent_position, position);
-                intent.putExtra(rq_itent_screen,111);
-                context.startActivity(intent);
-
+//                musicService.setSong(position);
+//                musicService.playSong();
+                Intent i = new Intent(context, PlayMussicActivity.class);
+                i.putExtra(SongAdapter.rq_itent_id, songsList.get(position).getId());
+                i.putExtra(SongAdapter.rq_itent_position, position);
+                i.putExtra(rq_itent_album, songsList.get(position).getIdAlbums());
+                i.putExtra(SongAdapter.rq_itent_screen, 123);
+                context.startActivity(i);
             }
         });
 

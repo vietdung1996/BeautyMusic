@@ -64,7 +64,7 @@ public class FragmentAlbums extends Fragment {
                 String thisTitle = musicCursor.getString(titleColumn);
                 String thisArtist = musicCursor.getString(artistColumn);
                 String thisArt = musicCursor.getString(artMusic);
-                albumsList.add(new Albums(thisId, thisTitle, thisArtist,thisArt));
+                albumsList.add(new Albums(thisId, thisTitle, thisArtist, thisArt));
             }
             while (musicCursor.moveToNext());
         }

@@ -25,7 +25,7 @@ import com.vietdung.beautymusic.until.MusicService;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ActivityAlbums extends AppCompatActivity {
+public class AlbumsActivity extends AppCompatActivity {
     Toolbar tb_Albums;
     ImageView iv_Albums;
     CollapsingToolbarLayout collapsingToolbarLayout;

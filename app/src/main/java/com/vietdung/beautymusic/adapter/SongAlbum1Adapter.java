@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.vietdung.beautymusic.R;
-import com.vietdung.beautymusic.activity.PlayMussic;
+import com.vietdung.beautymusic.activity.PlayMussicActivity;
 import com.vietdung.beautymusic.model.Albums;
 import com.vietdung.beautymusic.model.Songs;
 
@@ -50,7 +50,7 @@ public class SongAlbum1Adapter extends RecyclerView.Adapter<SongAlbum1Adapter.Re
             public void onClick(View view) {
 //                musicService.setSong(position);
 //                musicService.playSong();
-                Intent i = new Intent(context,PlayMussic.class);
+                Intent i = new Intent(context,PlayMussicActivity.class);
                 i.putExtra(SongAdapter.rq_itent_id,songsList.get(position).getId());
                 i.putExtra(SongAdapter.rq_itent_position,position);
                 i.putExtra(rq_itent_album,songsList.get(position).getIdAlbums());

@@ -5,13 +5,13 @@
     android:layout_margin="@dimen/margin10dp">
     <ImageView
         android:id="@+id/ivAlbums"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
         android:src="@drawable/musicalbums"
         android:scaleType="centerCrop"
         android:adjustViewBounds="true"/>
     <FrameLayout
-        android:layout_width="match_parent"
+        android:layout_width="160dp"
         android:layout_height="70dp"
         android:layout_gravity="top"
         android:background="@color/backgroungtransparentGreen">

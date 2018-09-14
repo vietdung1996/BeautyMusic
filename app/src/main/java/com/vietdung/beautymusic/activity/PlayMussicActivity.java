@@ -37,7 +37,7 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class PlayMussic extends AppCompatActivity {
+public class PlayMussicActivity extends AppCompatActivity {
     CircleImageView iv_CircleMussic;
     ImageButton btn_Back;
     ImageButton btn_Next;
@@ -55,7 +55,6 @@ public class PlayMussic extends AppCompatActivity {
     MusicService musicService;
     Intent playIntent;
     boolean musicBound = false;
-
     int position = 0;
 
 

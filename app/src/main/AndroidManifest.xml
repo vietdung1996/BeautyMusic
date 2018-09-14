@@ -23,10 +23,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.PlayMussic"
+            android:name=".activity.PlayMussicActivity"
             android:label="@string/title_activity_play_mussic"
             android:theme="@style/AppTheme"></activity>
-        <activity android:name=".activity.ActivityAlbums"/>
+        <activity android:name=".activity.AlbumsActivity"/>
+        <activity android:name=".activity.ArtistsActivity"/>
         <service android:enabled="true" android:name=".until.MusicService"/>
     </application>
 

@@ -13,7 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.vietdung.beautymusic.R;
-import com.vietdung.beautymusic.activity.ActivityAlbums;
+import com.vietdung.beautymusic.activity.AlbumsActivity;
 import com.vietdung.beautymusic.model.Albums;
 
 import java.util.List;
@@ -45,7 +45,7 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.Recyclervi
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(context, ActivityAlbums.class);
+                Intent intent = new Intent(context, AlbumsActivity.class);
                 intent.putExtra(idALbums,albumsList.get(position).getId());
                 intent.putExtra(SongAdapter.rq_itent_screen,123);
                 context.startActivity(intent);
