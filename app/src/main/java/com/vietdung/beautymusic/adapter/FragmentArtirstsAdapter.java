@@ -11,37 +11,39 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.vietdung.beautymusic.R;
-import com.vietdung.beautymusic.activity.AlbumsActivity;
 import com.vietdung.beautymusic.activity.ArtistsActivity;
 import com.vietdung.beautymusic.model.Author;
 
 import java.util.List;
 
-public class ArtirstsAdapter extends RecyclerView.Adapter<ArtirstsAdapter.RecyclerviewHolder> {
+public class FragmentArtirstsAdapter extends RecyclerView.Adapter<FragmentArtirstsAdapter.RecyclerviewHolder> {
     List<Author> authorList;
     Activity context;
 
-    public ArtirstsAdapter(List<Author> authorList, Activity context) {
+    public final static String rq_request_idArtist = "idArtist";
+
+    public FragmentArtirstsAdapter(List<Author> authorList, Activity context) {
         this.authorList = authorList;
         this.context = context;
     }
 
     @NonNull
     @Override
-    public ArtirstsAdapter.RecyclerviewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public FragmentArtirstsAdapter.RecyclerviewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.custom_albums, parent, false);
         return new RecyclerviewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ArtirstsAdapter.RecyclerviewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull FragmentArtirstsAdapter.RecyclerviewHolder holder, final int position) {
         holder.tvAlbumsAuthorName.setText(authorList.get(position).getNameAuthor());
         holder.tvNumberSong.setText(authorList.get(position).getNumberAlbum()+" album |"+authorList.get(position).getNumberSong()+" song");
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context, ArtistsActivity.class);
+                intent.putExtra(rq_request_idArtist,authorList.get(position).getId());
                 context.startActivity(intent);
             }
         });

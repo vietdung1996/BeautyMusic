@@ -19,16 +19,16 @@ import java.util.List;
 
 public class SongArtistsAdapter extends RecyclerView.Adapter<SongArtistsAdapter.RecyclerviewHolder> {
     private List<Songs> songsList;
-    List<Author> albumsList;
+    List<Author> authorList;
     Activity context;
     //MusicService musicService;
     public static String rq_itent_album = "123456";
 //    public static String rq_itent_position="xyz";
 
-    public SongArtistsAdapter(List<Songs> songsList, Activity context, int idAlbums) {
+    public SongArtistsAdapter(List<Songs> songsList, Activity context, int idArtist) {
         this.songsList = songsList;
         this.context = context;
-        this.albumsList = albumsList;
+        //this.authorList = albumsList;
         // this.idAlbums = idAlbums;
         // this.musicService =musicService;
     }
@@ -51,10 +51,10 @@ public class SongArtistsAdapter extends RecyclerView.Adapter<SongArtistsAdapter.
 //                musicService.setSong(position);
 //                musicService.playSong();
                 Intent i = new Intent(context, PlayMussicActivity.class);
-                i.putExtra(SongAdapter.rq_itent_id, songsList.get(position).getId());
-                i.putExtra(SongAdapter.rq_itent_position, position);
+                i.putExtra(FragmentSongAdapter.rq_itent_id, songsList.get(position).getId());
+                i.putExtra(FragmentSongAdapter.rq_itent_position, position);
                 i.putExtra(rq_itent_album, songsList.get(position).getIdAlbums());
-                i.putExtra(SongAdapter.rq_itent_screen, 123);
+                i.putExtra(FragmentSongAdapter.rq_itent_screen, 321);
                 context.startActivity(i);
             }
         });

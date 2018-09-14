@@ -1,13 +1,10 @@
 package com.vietdung.beautymusic.activity;
 
-import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -18,12 +15,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.vietdung.beautymusic.R;
-import com.vietdung.beautymusic.adapter.SongAdapter;
+import com.vietdung.beautymusic.adapter.FragmentSongAdapter;
 import com.vietdung.beautymusic.model.Songs;
-import com.vietdung.beautymusic.presenter.PresenterImpFragmentSong;
-import com.vietdung.beautymusic.presenter.PresenterLogicFragmentSong;
 import com.vietdung.beautymusic.presenter.ViewFragmentSong;
-import com.vietdung.beautymusic.until.MusicService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +27,7 @@ public class FragmentSongs extends Fragment implements ViewFragmentSong {
     // private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = ;
     RecyclerView rv_Songs;
     List<Songs> songsList;
-    SongAdapter songAdapter;
+    FragmentSongAdapter songAdapter;
     int numberofColumns = 1;
     Intent playIntent;
     boolean musicBound = false;
@@ -45,7 +39,7 @@ public class FragmentSongs extends Fragment implements ViewFragmentSong {
         rv_Songs = view.findViewById(R.id.rvSongs);
         //PresenterLogicFragmentSong presenterLogicFragmentSong = new PresenterLogicFragmentSong((PresenterImpFragmentSong) this,getActivity());
         songsList = new ArrayList<>();
-        songAdapter = new SongAdapter(songsList, getActivity());
+        songAdapter = new FragmentSongAdapter(songsList, getActivity());
         getData();
 
 

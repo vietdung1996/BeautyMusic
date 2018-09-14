@@ -13,5 +13,12 @@
         app:showAsAction="never">
 
     </item>
+    <item
+        android:id="@+id/ivSearch"
+        android:icon="@android:drawable/ic_menu_search"
+        android:title=""
+        app:showAsAction="always">
+
+    </item>
 
 </menu>

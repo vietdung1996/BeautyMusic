@@ -25,8 +25,9 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.vietdung.beautymusic.R;
-import com.vietdung.beautymusic.adapter.SongAdapter;
+import com.vietdung.beautymusic.adapter.FragmentSongAdapter;
 import com.vietdung.beautymusic.adapter.SongAlbum1Adapter;
+import com.vietdung.beautymusic.adapter.SongArtistsAdapter;
 import com.vietdung.beautymusic.adapter.SongMusic1Adapter;
 import com.vietdung.beautymusic.model.Songs;
 import com.vietdung.beautymusic.until.MusicService;
@@ -193,15 +194,15 @@ public class PlayMussicActivity extends AppCompatActivity {
 
     private void getPosition() {
         if (position < songsList.size()) {
-            position = getIntent().getIntExtra(SongAdapter.rq_itent_position, 0);
-            id = getIntent().getIntExtra(SongAdapter.rq_itent_id, 0);
+            position = getIntent().getIntExtra(FragmentSongAdapter.rq_itent_position, 0);
+            id = getIntent().getIntExtra(FragmentSongAdapter.rq_itent_id, 0);
             //  Log.d("ID", " " + position + " " + id);
         }
 
     }
 
     private void getSonglist() {
-        int screen = getIntent().getIntExtra(SongAdapter.rq_itent_screen, -1);
+        int screen = getIntent().getIntExtra(FragmentSongAdapter.rq_itent_screen, -1);
         // getSong full
         if (screen == 111) {
             ContentResolver cr = getContentResolver();
@@ -254,6 +255,36 @@ public class PlayMussicActivity extends AppCompatActivity {
                         String thisTitle = musicCursor.getString(titleColumn);
                         String thisArtist = musicCursor.getString(artistColumn);
                         songsList.add(new Songs(thisId, thisTitle, thisArtist, idAlbums));
+                    }
+                }
+                while (musicCursor.moveToNext());
+            }
+
+            songAdapter.notifyDataSetChanged();
+        } else if(screen==321){
+            int idArtist = getIntent().getIntExtra(SongArtistsAdapter.rq_itent_album, -1);
+            ContentResolver cr = getContentResolver();
+            Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+            Cursor musicCursor = cr.query(musicUri, null, null, null, null);
+
+            if (musicCursor != null && musicCursor.moveToFirst()) {
+                //get columns
+                int titleColumn = musicCursor.getColumnIndex
+                        (android.provider.MediaStore.Audio.Media.TITLE);
+                int idColumn = musicCursor.getColumnIndex
+                        (android.provider.MediaStore.Audio.Media._ID);
+                int artistColumn = musicCursor.getColumnIndex
+                        (android.provider.MediaStore.Audio.Media.ARTIST);
+                int albumsColums = musicCursor.getColumnIndex
+                        (MediaStore.Audio.Media.ARTIST_ID);
+                //add songs to list
+                do {
+                    int thisArtistID = musicCursor.getInt(albumsColums);
+                    if (thisArtistID == idArtist) {
+                        int thisId = musicCursor.getInt(idColumn);
+                        String thisTitle = musicCursor.getString(titleColumn);
+                        String thisArtist = musicCursor.getString(artistColumn);
+                        songsList.add(new Songs(thisId, thisTitle, thisArtist, idArtist));
                     }
                 }
                 while (musicCursor.moveToNext());

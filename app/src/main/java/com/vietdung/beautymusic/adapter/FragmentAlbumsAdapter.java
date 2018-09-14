@@ -18,12 +18,12 @@ import com.vietdung.beautymusic.model.Albums;
 
 import java.util.List;
 
-public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.RecyclerviewHolder> {
+public class FragmentAlbumsAdapter extends RecyclerView.Adapter<FragmentAlbumsAdapter.RecyclerviewHolder> {
     private List<Albums> albumsList;
     FragmentActivity context;
     public final static String idALbums = "1234";
 
-    public AlbumsAdapter(List<Albums> albumsList, FragmentActivity context) {
+    public FragmentAlbumsAdapter(List<Albums> albumsList, FragmentActivity context) {
         this.albumsList = albumsList;
         this.context = context;
     }
@@ -47,7 +47,7 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.Recyclervi
             public void onClick(View view) {
                 Intent intent = new Intent(context, AlbumsActivity.class);
                 intent.putExtra(idALbums,albumsList.get(position).getId());
-                intent.putExtra(SongAdapter.rq_itent_screen,123);
+                intent.putExtra(FragmentSongAdapter.rq_itent_screen,123);
                 context.startActivity(intent);
             }
         });

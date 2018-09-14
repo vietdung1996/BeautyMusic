@@ -2,8 +2,6 @@ package com.vietdung.beautymusic.activity;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -13,11 +11,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.widget.ImageView;
 
 import com.vietdung.beautymusic.R;
-import com.vietdung.beautymusic.adapter.AlbumsAdapter;
-import com.vietdung.beautymusic.adapter.SongAlbum1Adapter;
+import com.vietdung.beautymusic.adapter.FragmentArtirstsAdapter;
 import com.vietdung.beautymusic.adapter.SongArtistsAdapter;
 import com.vietdung.beautymusic.model.Albums;
 import com.vietdung.beautymusic.model.Songs;
@@ -36,7 +34,7 @@ public class ArtistsActivity extends AppCompatActivity {
     SongArtistsAdapter songArtistsAdapter;
     MusicService musicService;
 
-    int idAlbums = 0;
+    int idArtist = 0;
     String thisTitle = "";
     String thisArtist = "";
     String thisArt = "";
@@ -61,29 +59,28 @@ public class ArtistsActivity extends AppCompatActivity {
 
     // getAlbum from sdcard
     private void getAlbums() {
-        idAlbums = getIntent().getIntExtra(AlbumsAdapter.idALbums, 0);
+        idArtist = getIntent().getIntExtra(FragmentArtirstsAdapter.rq_request_idArtist, 0);
         ContentResolver cr = getApplication().getContentResolver();
-        Uri musicUri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
+        Uri musicUri = MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI;
         Cursor musicCursor = cr.query(musicUri, null, null, null, null);
 
         if (musicCursor != null && musicCursor.moveToFirst()) {
             //get columns
             int titleColumn = musicCursor.getColumnIndex
-                    (MediaStore.Audio.Albums.ALBUM);
+                    (MediaStore.Audio.Artists.ARTIST);
             int idColumn = musicCursor.getColumnIndex
-                    (MediaStore.Audio.Albums._ID);
-            int artistColumn = musicCursor.getColumnIndex
-                    (MediaStore.Audio.Albums.ARTIST);
-            int artMusic = musicCursor.getColumnIndex
-                    (MediaStore.Audio.Albums.ALBUM_ART);
+                    (MediaStore.Audio.Artists._ID);
+            int numberSong = musicCursor.getColumnIndex
+                    (MediaStore.Audio.Artists.NUMBER_OF_TRACKS);
+            Log.d("numberSong", " " + numberSong);
+            int numberAlbum = musicCursor.getColumnIndex
+                    (MediaStore.Audio.Artists.NUMBER_OF_ALBUMS);
             //add songs to list
             do {
 
                 int thisId = musicCursor.getInt(idColumn);
-                if (idAlbums == thisId) {
+                if (idArtist == thisId) {
                     thisTitle = musicCursor.getString(titleColumn);
-                    thisArtist = musicCursor.getString(artistColumn);
-                    thisArt = musicCursor.getString(artMusic);
                 }
 
                 //albumsList.add(new Albums(thisId, thisTitle, thisArtist,thisArt));
@@ -107,15 +104,15 @@ public class ArtistsActivity extends AppCompatActivity {
             int artistColumn = musicCursor.getColumnIndex
                     (android.provider.MediaStore.Audio.Media.ARTIST);
             int albumsColums = musicCursor.getColumnIndex
-                    (MediaStore.Audio.Media.ALBUM_ID);
+                    (MediaStore.Audio.Media.ARTIST_ID);
             //add songs to list
             do {
-                int thisAlbums = musicCursor.getInt(albumsColums);
-                if (thisAlbums == idAlbums) {
+                int thisArtistID = musicCursor.getInt(albumsColums);
+                if (thisArtistID == idArtist) {
                     int thisId = musicCursor.getInt(idColumn);
                     String thisTitle = musicCursor.getString(titleColumn);
                     String thisArtist = musicCursor.getString(artistColumn);
-                    songsList.add(new Songs(thisId, thisTitle, thisArtist,idAlbums));
+                    songsList.add(new Songs(thisId, thisTitle, thisArtist,idArtist));
                 }
             }
             while (musicCursor.moveToNext());
@@ -130,8 +127,8 @@ public class ArtistsActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         collapsingToolbarLayout.setTitle(thisTitle);
-        Bitmap bitmap = BitmapFactory.decodeFile(thisArt);
-        iv_Albums.setImageBitmap(bitmap);
+//        Bitmap bitmap = BitmapFactory.decodeFile(thisArt);
+//        iv_Albums.setImageBitmap(bitmap);
     }
 
     @Override
@@ -148,7 +145,7 @@ public class ArtistsActivity extends AppCompatActivity {
         rv_Albums = findViewById(R.id.rvAlbums);
         songsList = new ArrayList<>();
         albumsList = new ArrayList<>();
-        songArtistsAdapter = new SongArtistsAdapter(songsList, this, idAlbums);
+        songArtistsAdapter = new SongArtistsAdapter(songsList, this, idArtist);
         songArtistsAdapter.notifyDataSetChanged();
         rv_Albums.setAdapter(songArtistsAdapter);
         rv_Albums.setLayoutManager(new LinearLayoutManager(this));

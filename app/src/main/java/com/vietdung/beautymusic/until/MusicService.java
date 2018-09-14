@@ -18,7 +18,7 @@ import android.util.Log;
 
 import com.vietdung.beautymusic.R;
 import com.vietdung.beautymusic.activity.PlayMussicActivity;
-import com.vietdung.beautymusic.adapter.SongAdapter;
+import com.vietdung.beautymusic.adapter.FragmentSongAdapter;
 import com.vietdung.beautymusic.model.Songs;
 
 import java.io.IOException;
@@ -187,7 +187,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public void notification() {
 
         Intent i = new Intent(getApplicationContext(), PlayMussicActivity.class);
-        i.putExtra(SongAdapter.rq_itent_position,position);
+        i.putExtra(FragmentSongAdapter.rq_itent_position,position);
         //i.putExtra()
         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), (int) System.currentTimeMillis(), i, PendingIntent.FLAG_UPDATE_CURRENT);
         Notification.Builder builder = new Notification.Builder(this);

@@ -16,7 +16,7 @@ import com.vietdung.beautymusic.model.Songs;
 
 import java.util.List;
 
-public class SongAdapter extends RecyclerView.Adapter<SongAdapter.RecyclerviewHolder> {
+public class FragmentSongAdapter extends RecyclerView.Adapter<FragmentSongAdapter.RecyclerviewHolder> {
     private List<Songs> songsList;
     FragmentActivity context;
     public static String rq_itent_id = "abc";
@@ -24,7 +24,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.RecyclerviewHo
     public static String rq_itent_screen = "1996";
     //MusicService musicService;
 
-    public SongAdapter(List<Songs> songsList, FragmentActivity context) {
+    public FragmentSongAdapter(List<Songs> songsList, FragmentActivity context) {
         this.songsList = songsList;
         this.context = context;
     }

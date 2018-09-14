@@ -8,6 +8,7 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
@@ -93,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setToolbar() {
         setSupportActionBar(tb_main);
+       // FloatingActionButton fab = findViewById(R.id.fab)
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 

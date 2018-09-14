@@ -15,7 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.vietdung.beautymusic.R;
-import com.vietdung.beautymusic.adapter.AlbumsAdapter;
+import com.vietdung.beautymusic.adapter.FragmentAlbumsAdapter;
 import com.vietdung.beautymusic.model.Albums;
 
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ import java.util.List;
 public class FragmentAlbums extends Fragment {
     RecyclerView rv_Albums;
     List<Albums> albumsList;
-    AlbumsAdapter albumsAdapter;
+    FragmentAlbumsAdapter albumsAdapter;
     int numberofColumns = 2;
 
     @Nullable
@@ -34,7 +34,7 @@ public class FragmentAlbums extends Fragment {
         View view = inflater.inflate(R.layout.fragment_albums, container, false);
         rv_Albums = view.findViewById(R.id.rvAlbums);
         albumsList = new ArrayList<>();
-        albumsAdapter = new AlbumsAdapter(albumsList, getActivity());
+        albumsAdapter = new FragmentAlbumsAdapter(albumsList, getActivity());
         getData();
         rv_Albums.setAdapter(albumsAdapter);
         rv_Albums.setLayoutManager(new GridLayoutManager(getActivity(), numberofColumns));

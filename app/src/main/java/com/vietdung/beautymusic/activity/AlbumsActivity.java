@@ -16,7 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.widget.ImageView;
 
 import com.vietdung.beautymusic.R;
-import com.vietdung.beautymusic.adapter.AlbumsAdapter;
+import com.vietdung.beautymusic.adapter.FragmentAlbumsAdapter;
 import com.vietdung.beautymusic.adapter.SongAlbum1Adapter;
 import com.vietdung.beautymusic.model.Albums;
 import com.vietdung.beautymusic.model.Songs;
@@ -60,7 +60,7 @@ public class AlbumsActivity extends AppCompatActivity {
 
     // getAlbum from sdcard
     private void getAlbums() {
-        idAlbums = getIntent().getIntExtra(AlbumsAdapter.idALbums, 0);
+        idAlbums = getIntent().getIntExtra(FragmentAlbumsAdapter.idALbums, 0);
         ContentResolver cr = getApplication().getContentResolver();
         Uri musicUri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
         Cursor musicCursor = cr.query(musicUri, null, null, null, null);

@@ -16,7 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.vietdung.beautymusic.R;
-import com.vietdung.beautymusic.adapter.ArtirstsAdapter;
+import com.vietdung.beautymusic.adapter.FragmentArtirstsAdapter;
 import com.vietdung.beautymusic.model.Author;
 
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ import java.util.List;
 public class FragmentArtists extends Fragment {
     RecyclerView rv_Author;
     List<Author> authorList;
-    ArtirstsAdapter authorAdapter;
+    FragmentArtirstsAdapter authorAdapter;
     //int numberofColumns = 2;
 
     @Nullable
@@ -34,7 +34,7 @@ public class FragmentArtists extends Fragment {
         View view = inflater.inflate(R.layout.fragments_artists, container, false);
         rv_Author = view.findViewById(R.id.rvAuthor);
         authorList = new ArrayList<>();
-        authorAdapter = new ArtirstsAdapter(authorList, getActivity());
+        authorAdapter = new FragmentArtirstsAdapter(authorList, getActivity());
         getData();
         rv_Author.setAdapter(authorAdapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
