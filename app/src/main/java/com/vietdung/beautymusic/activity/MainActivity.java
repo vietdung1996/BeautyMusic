@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     ViewPager viewPager;
     TabLayout tabLayout;
     Toolbar tb_main;
-    MusicService musicService;
+    public static MusicService musicService;
     List<Songs> songsList;
     Intent playIntent;
     boolean musicBound = false;

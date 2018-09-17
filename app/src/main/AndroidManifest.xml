@@ -29,6 +29,9 @@
         <activity android:name=".activity.AlbumsActivity"/>
         <activity android:name=".activity.ArtistsActivity"/>
         <service android:enabled="true" android:name=".until.MusicService"/>
+        <receiver android:name=".until.NotificationPlayHandler"/>
+        <receiver android:name=".until.NotificationPrevBroadcast"/>
+        <receiver android:name=".until.NotificationNextBroadcast"/>
     </application>
 
 </manifest>

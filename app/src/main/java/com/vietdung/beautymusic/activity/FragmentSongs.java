@@ -8,9 +8,16 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -22,7 +29,9 @@ import com.vietdung.beautymusic.presenter.ViewFragmentSong;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FragmentSongs extends Fragment implements ViewFragmentSong {
+import static java.util.Locale.filter;
+
+public class FragmentSongs extends Fragment  {
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
     // private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = ;
     RecyclerView rv_Songs;
@@ -37,24 +46,12 @@ public class FragmentSongs extends Fragment implements ViewFragmentSong {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_songs, container, false);
         rv_Songs = view.findViewById(R.id.rvSongs);
+        setHasOptionsMenu(true);
         //PresenterLogicFragmentSong presenterLogicFragmentSong = new PresenterLogicFragmentSong((PresenterImpFragmentSong) this,getActivity());
         songsList = new ArrayList<>();
         songAdapter = new FragmentSongAdapter(songsList, getActivity());
         getData();
 
-
-//        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)
-//                != PackageManager.PERMISSION_GRANTED) {
-//            if (shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-//
-//            } else {
-//                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-//                        MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-//            }
-//
-//        } else {
-//            getData();
-//        }
         rv_Songs.setAdapter(songAdapter);
         rv_Songs.setLayoutManager(new GridLayoutManager(getActivity(), numberofColumns));
 
@@ -96,26 +93,49 @@ public class FragmentSongs extends Fragment implements ViewFragmentSong {
 
     }
 
-    @Override
-    public void displayList() {
 
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
+        inflater.inflate(R.menu.menu_main,menu);
+        final MenuItem item = menu.findItem(R.id.mnSearch);
+        final SearchView  searchView  = (SearchView) item.getActionView();
+        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        MenuItemCompat.setActionView(item, searchView);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                if(TextUtils.isEmpty(query)){
+                   if (!searchView.isIconified()) {
+                       searchView.setIconified(true);
+                   }
+                   item.collapseActionView();
+                    return false;
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+//                final  List<Songs> filtermodelist=filter(songsList,newText);
+//                songAdapter.setfilter(filtermodelist);
+                String userInput = newText.toLowerCase();
+                List<Songs> newsongList = new ArrayList<>();
+                for(Songs song : songsList){
+                    if(song.getNameSong().toLowerCase().contains(userInput)){
+                        newsongList.add(song);
+                    }
+                }
+                songAdapter.setfilter(newsongList);
+
+                Log.d("new song List", "null "+newsongList);
+                //songAdapter.notifyDataSetChanged();
+                return true;
+
+            }
+        });
     }
 
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-//        switch (requestCode) {
-//            case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE:
-//                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    {
-//                        if (ContextCompat.checkSelfPermission(getActivity(),
-//                                Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-//                            getData();
-//                            // doStuff();
-//                        } else {
-//                        }
-//                    }
-//                    return;
-//                }
-//        }
-//    }
 }

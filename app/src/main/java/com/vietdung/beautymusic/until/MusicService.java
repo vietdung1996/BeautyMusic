@@ -63,8 +63,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     @Override
     public void onDestroy() {
 
-        mediaPlayer.stop();
-        mediaPlayer.release();
+//        mediaPlayer.stop();
+//        mediaPlayer.release();
         super.onDestroy();
     }
 
@@ -98,7 +98,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public void onPrepared(MediaPlayer mediaPlayer) {
         mediaPlayer.start();
     }
-
 
 
     public void playSong() {
@@ -176,6 +175,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         return mediaPlayer.isPlaying();
     }
 
+
     public void seekTo(int pons) {
         mediaPlayer.seekTo(pons);
     }
@@ -187,7 +187,19 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public void notification() {
 
         Intent i = new Intent(getApplicationContext(), PlayMussicActivity.class);
-        i.putExtra(FragmentSongAdapter.rq_itent_position,position);
+        i.putExtra(FragmentSongAdapter.rq_itent_position, position);
+        i.putExtra(PlayMussicActivity.rq_notification,3000);
+        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+        //Button play
+        Intent btnPlayIntent = new Intent(this, NotificationPlayHandler.class);
+        PendingIntent btnPlayPendingIntent = PendingIntent.getBroadcast(this, 0, btnPlayIntent, 0);
+        // Back song
+        Intent btnBackIntent = new Intent(this, NotificationPrevBroadcast.class);
+        PendingIntent btnBackPendingIntent = PendingIntent.getBroadcast(this, 0, btnBackIntent, 0);
+        //
+        Intent btnNextIntent = new Intent(this, NotificationNextBroadcast.class);
+        PendingIntent btnNextPendingIntent = PendingIntent.getBroadcast(this, 0, btnNextIntent, 0);
         //i.putExtra()
         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), (int) System.currentTimeMillis(), i, PendingIntent.FLAG_UPDATE_CURRENT);
         Notification.Builder builder = new Notification.Builder(this);
@@ -197,14 +209,16 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                     .setContentText(songsList.get(position).getNameAuthor())
                     .setSmallIcon(R.drawable.music)
                     .setContentIntent(pendingIntent)
-                    //.setAutoCancel(true)
-                    .addAction(R.drawable.back, "Back",pendingIntent)
-                    .addAction(R.drawable.pause, "Pause", pendingIntent)
-                    .addAction(R.drawable.next, "Next", pendingIntent).build();
+                    //.setLargeIcon()
+                    .setAutoCancel(true)
+                    .addAction(R.drawable.back, "Back", btnBackPendingIntent)
+                    .addAction(R.drawable.pause, "Pause", btnPlayPendingIntent)
+                    .addAction(R.drawable.next, "Next", btnNextPendingIntent).build();
         }
         Notification not = builder.build();
 
         startForeground(NOTIFY_ID, not);
     }
+
 
 }

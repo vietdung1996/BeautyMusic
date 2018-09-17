@@ -58,6 +58,8 @@ public class PlayMussicActivity extends AppCompatActivity {
     boolean musicBound = false;
     int position = 0;
 
+    public final static String rq_notification = "2000";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,12 +74,6 @@ public class PlayMussicActivity extends AppCompatActivity {
         initView();
         addEvents();
 
-    }
-
-    @Override
-    protected void onStop() {
-        //musicService.unbindService(musicConnection);
-        super.onStop();
     }
 
     private ServiceConnection musicConnection = new ServiceConnection() {
@@ -101,47 +97,54 @@ public class PlayMussicActivity extends AppCompatActivity {
         }
     };
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-    }
-
-    protected void onDestroy() {
-        stopService(playIntent);
-        musicService = null;
-        unbindService(musicConnection);
-        super.onDestroy();
-    }
-
     public void songPicked() {
-        musicService.setSong(position);
-        musicService.playSong();
+        int rq_notifi=0;
+        rq_notifi = getIntent().getIntExtra(rq_notification,0);
+        if(rq_notifi!=3000){
+            musicService.setSong(position);
+            musicService.playSong();
+        }else{
+            if(musicService!=null && musicService.isPng()){
+                iv_Play.setVisibility(View.INVISIBLE);
+                iv_Pause.setVisibility(View.VISIBLE);
+            }else{
+                iv_Play.setVisibility(View.VISIBLE);
+                iv_Pause.setVisibility(View.INVISIBLE);
+            }
+        }
+
     }
 
     private void addEvents() {
         getSonglist();
         getPosition();
         setButtonClick();
+        //ivPlayorPause();
     }
 
     private void setButtonClick() {
         iv_Pause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                musicService.pauseSong();
-                iv_Pause.setVisibility(View.INVISIBLE);
-                iv_Play.setVisibility(View.VISIBLE);
-                setPlayingMusic();
+                if(musicService.isPng()){
+                    musicService.pauseSong();
+                    iv_Pause.setVisibility(View.INVISIBLE);
+                    iv_Play.setVisibility(View.VISIBLE);
+                    setPlayingMusic();
+                }
+
             }
         });
         iv_Play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                musicService.pauseSong();
-                iv_Pause.setVisibility(View.VISIBLE);
-                iv_Play.setVisibility(View.INVISIBLE);
-                setPlayingMusic();
+                if(musicService.isPng()==false){
+                    musicService.pauseSong();
+                    iv_Pause.setVisibility(View.VISIBLE);
+                    iv_Play.setVisibility(View.INVISIBLE);
+                    setPlayingMusic();
+                }
+
             }
         });
         btn_Back.setOnClickListener(new View.OnClickListener() {
@@ -193,6 +196,8 @@ public class PlayMussicActivity extends AppCompatActivity {
     }
 
     private void getPosition() {
+
+
         if (position < songsList.size()) {
             position = getIntent().getIntExtra(FragmentSongAdapter.rq_itent_position, 0);
             id = getIntent().getIntExtra(FragmentSongAdapter.rq_itent_id, 0);
@@ -201,6 +206,44 @@ public class PlayMussicActivity extends AppCompatActivity {
 
     }
 
+
+
+    private void setToolbar() {
+        setSupportActionBar(tb_PlayMusic);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setPlayingMusic();
+    }
+
+    private void setPlayingMusic() {
+        getSupportActionBar().setTitle(songsList.get(musicService.getPosition()).getNameSong());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("mm:ss");
+        if (musicService != null && musicBound && musicService.isPng()) {
+            tv_TimeTotal.setText(dateFormat.format(musicService.getTimeTotal()));
+            seekBar.setMax(musicService.getTimeTotal());
+        }
+
+    }
+
+    private void updateTimeSong() {
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("mm:ss");
+                //tv_Time.setText(dateFormat.format(musicService.getCurrentPosition()));
+
+                if (musicService != null && musicBound && musicService.isPng()) {
+                    tv_Time.setText(dateFormat.format(musicService.getCurrentPosition()));
+                    seekBar.setProgress(musicService.getCurrentPosition());
+                    musicService.autoNextSong();
+                    setPlayingMusic();
+                }
+
+
+                handler.postDelayed(this, 500);
+            }
+        }, 100);
+    }
     private void getSonglist() {
         int screen = getIntent().getIntExtra(FragmentSongAdapter.rq_itent_screen, -1);
         // getSong full
@@ -321,41 +364,21 @@ public class PlayMussicActivity extends AppCompatActivity {
 
     }
 
-    private void setToolbar() {
-        setSupportActionBar(tb_PlayMusic);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        setPlayingMusic();
-    }
-
-    private void setPlayingMusic() {
-        getSupportActionBar().setTitle(songsList.get(musicService.getPosition()).getNameSong());
-        SimpleDateFormat dateFormat = new SimpleDateFormat("mm:ss");
-        if (musicService != null && musicBound && musicService.isPng()) {
-            tv_TimeTotal.setText(dateFormat.format(musicService.getTimeTotal()));
-            seekBar.setMax(musicService.getTimeTotal());
-        }
+    @Override
+    protected void onStart() {
+        super.onStart();
 
     }
 
-    private void updateTimeSong() {
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("mm:ss");
-                //tv_Time.setText(dateFormat.format(musicService.getCurrentPosition()));
+    protected void onDestroy() {
+        stopService(playIntent);
+        musicService = null;
+        unbindService(musicConnection);
+        super.onDestroy();
+    }
 
-                if (musicService != null && musicBound && musicService.isPng()) {
-                    tv_Time.setText(dateFormat.format(musicService.getCurrentPosition()));
-                    seekBar.setProgress(musicService.getCurrentPosition());
-                    musicService.autoNextSong();
-                    setPlayingMusic();
-                }
+    public void ivPlayorPause(){
 
-
-                handler.postDelayed(this, 500);
-            }
-        }, 100);
     }
 
     private void initView() {
@@ -368,7 +391,8 @@ public class PlayMussicActivity extends AppCompatActivity {
         iv_Repeat = findViewById(R.id.ivRepeat);
         iv_Pause = findViewById(R.id.ivPause);
         iv_Play = findViewById(R.id.ivStart);
-        iv_Play.setVisibility(View.INVISIBLE);
+        iv_Play.setVisibility(View.INVISIBLE
+        );
         tb_PlayMusic = findViewById(R.id.tbPlayMussic);
         rv_Song = findViewById(R.id.rvMusicSong);
         seekBar = findViewById(R.id.seekbar);

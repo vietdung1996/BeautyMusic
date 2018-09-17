@@ -14,6 +14,7 @@ import com.vietdung.beautymusic.R;
 import com.vietdung.beautymusic.activity.PlayMussicActivity;
 import com.vietdung.beautymusic.model.Songs;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FragmentSongAdapter extends RecyclerView.Adapter<FragmentSongAdapter.RecyclerviewHolder> {
@@ -71,5 +72,12 @@ public class FragmentSongAdapter extends RecyclerView.Adapter<FragmentSongAdapte
             tv_NameAuthor = itemView.findViewById(R.id.tvAuthorName);
             tv_NameSong = itemView.findViewById(R.id.tvSongName);
         }
+    }
+
+    public void setfilter(List<Songs> listSong)
+    {
+        songsList=new ArrayList<>();
+        songsList.addAll(listSong);
+        notifyDataSetChanged();
     }
 }
