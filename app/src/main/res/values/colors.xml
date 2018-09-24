@@ -5,6 +5,7 @@
     <color name="colorAccent">#FF4081</color>
     <color name="colorBlue">#15dae1</color>
     <color name="backgroungtransparentGreen">#6643A047</color>
+    <color name="backgroungtransparent">#00FFFFFF</color>
     <color name="colorWhite">#ffff</color>
     <color name="colorBlack">#000000</color>
 

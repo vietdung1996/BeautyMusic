@@ -119,8 +119,6 @@ public class FragmentSongs extends Fragment  {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-//                final  List<Songs> filtermodelist=filter(songsList,newText);
-//                songAdapter.setfilter(filtermodelist);
                 String userInput = newText.toLowerCase();
                 List<Songs> newsongList = new ArrayList<>();
                 for(Songs song : songsList){

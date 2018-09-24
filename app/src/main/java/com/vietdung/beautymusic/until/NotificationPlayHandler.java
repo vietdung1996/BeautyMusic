@@ -16,6 +16,5 @@ public class NotificationPlayHandler extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         MusicService musicService = MainActivity.musicService;
         musicService.pauseSong();
-
     }
 }

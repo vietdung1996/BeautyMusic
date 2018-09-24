@@ -1,11 +1,17 @@
 package com.vietdung.beautymusic.activity;
 
+import android.content.ComponentName;
 import android.content.ContentResolver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -14,6 +20,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.widget.ImageView;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import com.vietdung.beautymusic.R;
 import com.vietdung.beautymusic.adapter.FragmentAlbumsAdapter;
@@ -30,10 +38,13 @@ public class AlbumsActivity extends AppCompatActivity {
     ImageView iv_Albums;
     CollapsingToolbarLayout collapsingToolbarLayout;
     RecyclerView rv_Albums;
+    SeekBar seekBarBottom;
+    TextView tv_SongBottom, tv_ArtistBottom;
+    ImageView iv_Pause;
     List<Songs> songsList;
     List<Albums> albumsList;
     SongAlbum1Adapter songMusicAdapter;
-    MusicService musicService;
+
 
     int idAlbums = 0;
     String thisTitle = "";
@@ -51,11 +62,18 @@ public class AlbumsActivity extends AppCompatActivity {
         addEvents();
     }
 
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
     private void addEvents() {
 
         getAlbums();
         getSongAlbums();
         setToolbar();
+        updateTimeSong();
     }
 
     // getAlbum from sdcard
@@ -139,12 +157,72 @@ public class AlbumsActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (MainActivity.musicService != null) {
+            setDisplayMusicBottom();
+        }
+    }
+    public void setDisplayMusicBottom() {
+        //int position = musicService.getPosition();
+        //Log.d("Namesong", " "+songsList.get(position).getNameSong());
+        // Log.d("NameAritis", " "+musicService.getNameArtist());
+        if (MainActivity.musicService.isPng()) {
+            tv_SongBottom.setText(MainActivity.musicService.getNameSong());
+            tv_ArtistBottom.setText(MainActivity.musicService.getNameArtist());
+            seekBarBottom.setMax(MainActivity.musicService.getTimeTotal());
+            seekBarBottom.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+                    MainActivity.musicService.seekTo(seekBar.getProgress());
+
+                }
+
+            });
+
+        }
+    }
+
+    private void updateTimeSong() {
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (MainActivity.musicService != null && MainActivity.musicService.isPng()) {
+                    //tv_Time.setText(dateFormat.format(musicService.getCurrentPosition()));
+                    seekBarBottom.setProgress(MainActivity.musicService.getCurrentPosition());
+                    tv_SongBottom.setText(MainActivity.musicService.getNameSong());
+                    tv_ArtistBottom.setText(MainActivity.musicService.getNameArtist());
+                    MainActivity.musicService.autoNextSong();
+                }
+                handler.postDelayed(this, 500);
+            }
+        }, 100);
+    }
+
 
     private void initView() {
         tb_Albums = findViewById(R.id.tbAlbums);
         iv_Albums = findViewById(R.id.ivActivityAlbums);
         collapsingToolbarLayout = findViewById(R.id.collToolBar);
         rv_Albums = findViewById(R.id.rvAlbums);
+
+        seekBarBottom = findViewById(R.id.seekbarBottomAlbum);
+        tv_SongBottom = findViewById(R.id.tvSongsAlbum);
+        tv_ArtistBottom = findViewById(R.id.tvArtistAlbum);
+        iv_Pause = findViewById(R.id.ivPauseBottomAlbum);
+
         songsList = new ArrayList<>();
         albumsList = new ArrayList<>();
         songMusicAdapter = new SongAlbum1Adapter(songsList, this, idAlbums);

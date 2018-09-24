@@ -17,34 +17,34 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/ivCircleMusic"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
+        android:layout_width="230dp"
+        android:layout_height="230dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="60dp"
         app:civ_border_color="@color/colorBlack"
         app:civ_border_width="2dp"
-        android:src="@drawable/beatslogo"/>
-    <ImageButton
+        android:src="@drawable/beatslogo" />
+    <ImageView
         android:id="@+id/ibBack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/tbPlayMussic"
-        android:src="@drawable/back"
+        android:src="@drawable/backtrackbutton"
         android:layout_marginTop="100dp"
         android:layout_marginLeft="@dimen/margin10dp"
-        android:background="@color/colorWhite"
+
         />
 
-    <ImageButton
+    <ImageView
         android:id="@+id/ibNext"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignTop="@+id/ibBack"
-        android:src="@drawable/next"
+        android:src="@drawable/nexttrackbutton"
         android:layout_marginRight="@dimen/margin10dp"
-        android:background="@color/colorWhite"/>
+        />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -86,24 +86,26 @@
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/ibBack"
         android:layout_below="@+id/seekbar"
-        android:src="@drawable/repeat" />
+        android:src="@drawable/repeattrack" />
 
-    <ImageView
+    <ImageButton
         android:id="@+id/ivPause"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/seekbar"
         android:layout_centerHorizontal="true"
-        android:src="@drawable/pause" />
-    <ImageView
+        android:src="@drawable/pausetrack"
+        android:background="@color/backgroungtransparent"/>
+    <ImageButton
         android:id="@+id/ivStart"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/seekbar"
         android:layout_centerHorizontal="true"
-        android:src="@drawable/play" />
+        android:src="@drawable/playtrack"
+        android:background="@color/backgroungtransparent"/>
 
-    <ListView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/rvMusicSong"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -113,6 +115,6 @@
         android:background="@color/colorWhite"
         android:layout_marginTop="@dimen/margin5dp">
 
-    </ListView>
+    </android.support.v7.widget.RecyclerView>
 
 </RelativeLayout>

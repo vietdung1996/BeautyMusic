@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -28,10 +29,17 @@
             android:theme="@style/AppTheme"></activity>
         <activity android:name=".activity.AlbumsActivity"/>
         <activity android:name=".activity.ArtistsActivity"/>
+        <activity android:name=".activity.PlayingQueueActivity"/>
         <service android:enabled="true" android:name=".until.MusicService"/>
         <receiver android:name=".until.NotificationPlayHandler"/>
         <receiver android:name=".until.NotificationPrevBroadcast"/>
         <receiver android:name=".until.NotificationNextBroadcast"/>
+        <receiver android:name=".until.MusicService$CancelNotificationBroadcast">
+            <intent-filter>
+                <action
+                    android:name = "CancelNotifi" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

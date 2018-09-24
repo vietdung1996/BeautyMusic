@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -13,6 +14,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.widget.ImageView;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import com.vietdung.beautymusic.R;
 import com.vietdung.beautymusic.adapter.FragmentArtirstsAdapter;
@@ -29,6 +32,9 @@ public class ArtistsActivity extends AppCompatActivity {
     ImageView iv_Albums;
     CollapsingToolbarLayout collapsingToolbarLayout;
     RecyclerView rv_Albums;
+    SeekBar seekBarBottom;
+    TextView tv_SongBottom, tv_ArtistBottom;
+    ImageView iv_Pause;
     List<Songs> songsList;
     List<Albums> albumsList;
     SongArtistsAdapter songArtistsAdapter;
@@ -55,6 +61,7 @@ public class ArtistsActivity extends AppCompatActivity {
         getAlbums();
         getSongAlbums();
         setToolbar();
+        updateTimeSong();
     }
 
     // getAlbum from sdcard
@@ -137,12 +144,72 @@ public class ArtistsActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (MainActivity.musicService != null) {
+            setDisplayMusicBottom();
+        }
+    }
+    public void setDisplayMusicBottom() {
+        //int position = musicService.getPosition();
+        //Log.d("Namesong", " "+songsList.get(position).getNameSong());
+        // Log.d("NameAritis", " "+musicService.getNameArtist());
+        if (MainActivity.musicService.isPng()) {
+            tv_SongBottom.setText(MainActivity.musicService.getNameSong());
+            tv_ArtistBottom.setText(MainActivity.musicService.getNameArtist());
+            seekBarBottom.setMax(MainActivity.musicService.getTimeTotal());
+            seekBarBottom.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+                    MainActivity.musicService.seekTo(seekBar.getProgress());
+
+                }
+
+            });
+
+        }
+    }
+
+    private void updateTimeSong() {
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (MainActivity.musicService != null && MainActivity.musicService.isPng()) {
+                    //tv_Time.setText(dateFormat.format(musicService.getCurrentPosition()));
+                    seekBarBottom.setProgress(MainActivity.musicService.getCurrentPosition());
+                    MainActivity.musicService.autoNextSong();
+                    tv_SongBottom.setText(MainActivity.musicService.getNameSong());
+                    tv_ArtistBottom.setText(MainActivity.musicService.getNameArtist());
+                }
+                handler.postDelayed(this, 500);
+            }
+        }, 100);
+    }
+
+
 
     private void initView() {
         tb_Albums = findViewById(R.id.tbAlbums);
         iv_Albums = findViewById(R.id.ivActivityAlbums);
         collapsingToolbarLayout = findViewById(R.id.collToolBar);
         rv_Albums = findViewById(R.id.rvAlbums);
+
+        seekBarBottom = findViewById(R.id.seekbarBottomAlbum);
+        tv_SongBottom = findViewById(R.id.tvSongsAlbum);
+        tv_ArtistBottom = findViewById(R.id.tvArtistAlbum);
+        iv_Pause = findViewById(R.id.ivPauseBottomAlbum);
         songsList = new ArrayList<>();
         albumsList = new ArrayList<>();
         songArtistsAdapter = new SongArtistsAdapter(songsList, this, idArtist);

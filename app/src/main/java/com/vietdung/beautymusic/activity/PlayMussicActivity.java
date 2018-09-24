@@ -14,13 +14,16 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
-import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -28,7 +31,7 @@ import com.vietdung.beautymusic.R;
 import com.vietdung.beautymusic.adapter.FragmentSongAdapter;
 import com.vietdung.beautymusic.adapter.SongAlbum1Adapter;
 import com.vietdung.beautymusic.adapter.SongArtistsAdapter;
-import com.vietdung.beautymusic.adapter.SongMusic1Adapter;
+import com.vietdung.beautymusic.adapter.SongMusicAdapter;
 import com.vietdung.beautymusic.model.Songs;
 import com.vietdung.beautymusic.until.MusicService;
 
@@ -38,11 +41,11 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class PlayMussicActivity extends AppCompatActivity {
+public class PlayMussicActivity extends AppCompatActivity implements SongMusicAdapter.OnItemClickListener {
     CircleImageView iv_CircleMussic;
-    ImageButton btn_Back;
-    ImageButton btn_Next;
-    ImageView iv_Pause;
+    ImageView btn_Back;
+    ImageView btn_Next;
+    ImageButton iv_Pause;
     ImageView iv_Play;
     ObjectAnimator animator;
     TextView tv_Time, tv_TimeTotal;
@@ -50,15 +53,19 @@ public class PlayMussicActivity extends AppCompatActivity {
     ImageView iv_Repeat, iv_Suffle;
     Toolbar tb_PlayMusic;
     List<Songs> songsList;
-    SongMusic1Adapter songAdapter;
-    ListView rv_Song;
+    SongMusicAdapter songAdapter;
+    RecyclerView rv_Song;
     int id = 0;
     MusicService musicService;
     Intent playIntent;
     boolean musicBound = false;
     int position = 0;
+    int screen;
 
     public final static String rq_notification = "2000";
+    public final static String rq_screen = "screen";
+    public final static String rq_screen_idalbums = "screen_idalbums";
+    public final static String rq_screen_idartist = "screen_idartist";
 
 
     @Override
@@ -75,6 +82,7 @@ public class PlayMussicActivity extends AppCompatActivity {
         addEvents();
 
     }
+
 
     private ServiceConnection musicConnection = new ServiceConnection() {
 
@@ -167,6 +175,34 @@ public class PlayMussicActivity extends AppCompatActivity {
                 setPlayingMusic();
             }
         });
+        iv_Repeat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                iv_Pause.setVisibility(View.VISIBLE);
+                iv_Play.setVisibility(View.INVISIBLE);
+                boolean repeat=musicService.setRepeat();
+                if(repeat==true){
+                    iv_Repeat.setImageResource(R.drawable.repeatcolor);
+
+                }else{
+                    iv_Repeat.setImageResource(R.drawable.repeattrack);
+                }
+            }
+        });
+        iv_Suffle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                iv_Pause.setVisibility(View.VISIBLE);
+                iv_Play.setVisibility(View.INVISIBLE);
+               boolean shuffle = musicService.setShuffle();
+                if(shuffle){
+                    iv_Suffle.setImageResource(R.drawable.shufflecolor);
+
+                }else{
+                    iv_Suffle.setImageResource(R.drawable.iconsuffle);
+                }
+            }
+        });
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -184,24 +220,16 @@ public class PlayMussicActivity extends AppCompatActivity {
 
             }
         });
-        rv_Song.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                musicService.setSong(i);
-                musicService.playSong();
-            }
-        });
-
-
     }
 
     private void getPosition() {
-
-
         if (position < songsList.size()) {
-            position = getIntent().getIntExtra(FragmentSongAdapter.rq_itent_position, 0);
             id = getIntent().getIntExtra(FragmentSongAdapter.rq_itent_id, 0);
-            //  Log.d("ID", " " + position + " " + id);
+            for (int i = 0; i < songsList.size(); i++) {
+                if (id == songsList.get(i).getId()) {
+                    position = i;
+                }
+            }
         }
 
     }
@@ -215,7 +243,13 @@ public class PlayMussicActivity extends AppCompatActivity {
     }
 
     private void setPlayingMusic() {
-        getSupportActionBar().setTitle(songsList.get(musicService.getPosition()).getNameSong());
+        for (int i = 0; i < songsList.size(); i++) {
+            if (musicService.getId() == songsList.get(i).getId()) {
+                Log.d("idsong ", " " + musicService.getId() + " " + i);
+                getSupportActionBar().setTitle(songsList.get(i).getNameSong());
+            }
+        }
+        //getSupportActionBar().setTitle(songsList.get(musicService.getPosition()).getNameSong());
         SimpleDateFormat dateFormat = new SimpleDateFormat("mm:ss");
         if (musicService != null && musicBound && musicService.isPng()) {
             tv_TimeTotal.setText(dateFormat.format(musicService.getTimeTotal()));
@@ -223,7 +257,7 @@ public class PlayMussicActivity extends AppCompatActivity {
         }
 
     }
-
+    // update seekbar when music is playing
     private void updateTimeSong() {
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -244,8 +278,9 @@ public class PlayMussicActivity extends AppCompatActivity {
             }
         }, 100);
     }
+    //get list song from sd card
     private void getSonglist() {
-        int screen = getIntent().getIntExtra(FragmentSongAdapter.rq_itent_screen, -1);
+        screen = getIntent().getIntExtra(FragmentSongAdapter.rq_itent_screen, -1);
         // getSong full
         if (screen == 111) {
             ContentResolver cr = getContentResolver();
@@ -365,9 +400,28 @@ public class PlayMussicActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_playmusic, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.mnPlayQueue:
+                Intent intent = new Intent(this, PlayingQueueActivity.class);
+                intent.putExtra(rq_screen, screen);
+                if (screen == 123) {
+                    int idAlbums = getIntent().getIntExtra(SongAlbum1Adapter.rq_itent_album, -1);
+                    intent.putExtra(rq_screen_idalbums, idAlbums);
+                } else if (screen == 321) {
+                    int idArtist = getIntent().getIntExtra(SongArtistsAdapter.rq_itent_album, -1);
+                    intent.putExtra(rq_screen_idartist, idArtist);
+                }
+                startActivity(intent);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     protected void onDestroy() {
@@ -377,9 +431,6 @@ public class PlayMussicActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    public void ivPlayorPause(){
-
-    }
 
     private void initView() {
         iv_CircleMussic = findViewById(R.id.ivCircleMusic);
@@ -391,15 +442,18 @@ public class PlayMussicActivity extends AppCompatActivity {
         iv_Repeat = findViewById(R.id.ivRepeat);
         iv_Pause = findViewById(R.id.ivPause);
         iv_Play = findViewById(R.id.ivStart);
-        iv_Play.setVisibility(View.INVISIBLE
-        );
+        iv_Play.setVisibility(View.INVISIBLE);
         tb_PlayMusic = findViewById(R.id.tbPlayMussic);
         rv_Song = findViewById(R.id.rvMusicSong);
         seekBar = findViewById(R.id.seekbar);
         musicService = new MusicService();
         songsList = new ArrayList<>();
-        songAdapter = new SongMusic1Adapter(songsList, this);
+        songAdapter = new SongMusicAdapter(songsList, this);
+        songAdapter.setClickListener(this);
         rv_Song.setAdapter(songAdapter);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        rv_Song.setLayoutManager(layoutManager);
         animator = ObjectAnimator.ofFloat(iv_CircleMussic, "rotation", 0f, 360f);
         animator.setDuration(10000);
         animator.setRepeatCount(ValueAnimator.INFINITE);
@@ -407,4 +461,12 @@ public class PlayMussicActivity extends AppCompatActivity {
         animator.setInterpolator(new LinearInterpolator());
     }
 
+    //click adapter
+    @Override
+    public void onItemClick(View song, int position) {
+        musicService.setSong(position);
+        musicService.playSong();
+
+
+    }
 }

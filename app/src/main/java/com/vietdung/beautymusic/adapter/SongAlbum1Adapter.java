@@ -21,6 +21,9 @@ public class SongAlbum1Adapter extends RecyclerView.Adapter<SongAlbum1Adapter.Re
     private List<Songs> songsList;
     List<Albums>albumsList;
     Activity context;
+    Activity getContext;
+
+
     //MusicService musicService;
     public static String rq_itent_album="123456";
 //    public static String rq_itent_position="xyz";
