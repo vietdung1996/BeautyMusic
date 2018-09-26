@@ -18,22 +18,17 @@ import java.util.List;
 public class SongMusicAdapter extends RecyclerView.Adapter<SongMusicAdapter.RecyclerviewHolder>{
     private List<Songs> songsList;
     FragmentActivity context;
-    MusicService musicService;
-
 
 
     public interface OnItemClickListener{
-       // void onItemClick(Songs song);
         void onItemClick(View song, int position);
     }
 
     private OnItemClickListener listener;
-    //MusicService musicService;
 
     public SongMusicAdapter(List<Songs> songsList, FragmentActivity context) {
         this.songsList = songsList;
         this.context = context;
-       // this.musicService = musicService;
     }
 
     @NonNull
@@ -57,8 +52,6 @@ public class SongMusicAdapter extends RecyclerView.Adapter<SongMusicAdapter.Recy
     public void setClickListener(OnItemClickListener itemClickListener) {
         this.listener = itemClickListener;
     }
-
-
 
     public class RecyclerviewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView iv_Beats;

@@ -11,6 +11,10 @@ public class NotificationPrevBroadcast extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         MusicService musicService = MainActivity.musicService;
-        musicService.backSong();
+        if(musicService!=null){
+            musicService.backSong();
+        }else{
+        }
+
     }
 }

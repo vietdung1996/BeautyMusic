@@ -34,12 +34,9 @@
         <receiver android:name=".until.NotificationPlayHandler"/>
         <receiver android:name=".until.NotificationPrevBroadcast"/>
         <receiver android:name=".until.NotificationNextBroadcast"/>
-        <receiver android:name=".until.MusicService$CancelNotificationBroadcast">
-            <intent-filter>
-                <action
-                    android:name = "CancelNotifi" />
-            </intent-filter>
-        </receiver>
+        <receiver android:name=".until.NotificationCloseBroadcast"/>
+        <receiver android:name=".until.MusicService$NotificationClose1Broadcast"/>
+
     </application>
 
 </manifest>

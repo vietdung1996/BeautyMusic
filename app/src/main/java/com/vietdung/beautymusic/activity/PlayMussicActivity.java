@@ -7,6 +7,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -27,11 +28,14 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.vietdung.beautymusic.R;
 import com.vietdung.beautymusic.adapter.FragmentSongAdapter;
 import com.vietdung.beautymusic.adapter.SongAlbum1Adapter;
 import com.vietdung.beautymusic.adapter.SongArtistsAdapter;
 import com.vietdung.beautymusic.adapter.SongMusicAdapter;
+import com.vietdung.beautymusic.database.getDataSdCard;
 import com.vietdung.beautymusic.model.Songs;
 import com.vietdung.beautymusic.until.MusicService;
 
@@ -62,11 +66,14 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
     int position = 0;
     int screen;
 
+    getDataSdCard getDataSdCard;
+    private SharedPreferences sharedPreferences;
+    public static final String LIST_OF_SORTED_DATA_ID = "json_list_sorted_data_id";
+    public final static String PREFERENCE_FILE = "preference_file";
     public final static String rq_notification = "2000";
     public final static String rq_screen = "screen";
     public final static String rq_screen_idalbums = "screen_idalbums";
     public final static String rq_screen_idartist = "screen_idartist";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,10 +86,10 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
             startService(playIntent);
         }
         initView();
+
         addEvents();
 
     }
-
 
     private ServiceConnection musicConnection = new ServiceConnection() {
 
@@ -96,7 +103,11 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
             songPicked();
             musicBound = true;
             setToolbar();
-            updateTimeSong();
+            if(musicService!=null&&musicBound){
+                musicService.setRunBackground(false);
+
+            }
+
         }
 
         @Override
@@ -104,6 +115,12 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
             musicBound = false;
         }
     };
+
+    private void addEvents() {
+        getPosition();
+        setButtonClick();
+        updateTimeSong();
+    }
 
     public void songPicked() {
         int rq_notifi=0;
@@ -123,13 +140,6 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
 
     }
 
-    private void addEvents() {
-        getSonglist();
-        getPosition();
-        setButtonClick();
-        //ivPlayorPause();
-    }
-
     private void setButtonClick() {
         iv_Pause.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -146,8 +156,8 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
         iv_Play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(musicService.isPng()==false){
-                    musicService.pauseSong();
+                if(!musicService.isPng()){
+                    musicService.pauseToPlaySong();
                     iv_Pause.setVisibility(View.VISIBLE);
                     iv_Play.setVisibility(View.INVISIBLE);
                     setPlayingMusic();
@@ -178,8 +188,6 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
         iv_Repeat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                iv_Pause.setVisibility(View.VISIBLE);
-                iv_Play.setVisibility(View.INVISIBLE);
                 boolean repeat=musicService.setRepeat();
                 if(repeat==true){
                     iv_Repeat.setImageResource(R.drawable.repeatcolor);
@@ -192,8 +200,6 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
         iv_Suffle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                iv_Pause.setVisibility(View.VISIBLE);
-                iv_Play.setVisibility(View.INVISIBLE);
                boolean shuffle = musicService.setShuffle();
                 if(shuffle){
                     iv_Suffle.setImageResource(R.drawable.shufflecolor);
@@ -234,12 +240,17 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
 
     }
 
-
-
     private void setToolbar() {
         setSupportActionBar(tb_PlayMusic);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
         setPlayingMusic();
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 
     private void setPlayingMusic() {
@@ -272,8 +283,6 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
                     musicService.autoNextSong();
                     setPlayingMusic();
                 }
-
-
                 handler.postDelayed(this, 500);
             }
         }, 100);
@@ -408,6 +417,7 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            // start intent Playing Queue
             case R.id.mnPlayQueue:
                 Intent intent = new Intent(this, PlayingQueueActivity.class);
                 intent.putExtra(rq_screen, screen);
@@ -425,10 +435,49 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
     }
 
     protected void onDestroy() {
-        stopService(playIntent);
+        //stopService(playIntent);
         musicService = null;
         unbindService(musicConnection);
         super.onDestroy();
+    }
+
+    private List<Songs> getSampleData() {
+        screen = getIntent().getIntExtra(FragmentSongAdapter.rq_itent_screen, -1);
+        getDataSdCard = new getDataSdCard(this, screen);
+        //Get the song data
+        List<Songs> songsList = getDataSdCard.getDataPlayMusic();
+        //create an empty array to hold the list of sorted Customers
+        List<Songs> sortedSongs = new ArrayList<Songs>();
+        //get the JSON array of the ordered of sorted customers
+        String jsonListOfSortedCustomerId = sharedPreferences.getString(LIST_OF_SORTED_DATA_ID, "");
+        //check for null
+        if (!jsonListOfSortedCustomerId.isEmpty()) {
+            //convert JSON array into a List<Long>
+            Gson gson = new Gson();
+            List<Long> listOfSortedCustomersId = gson.fromJson(jsonListOfSortedCustomerId, new TypeToken<List<Long>>() {
+            }.getType());
+            //build sorted list
+            if (listOfSortedCustomersId != null && listOfSortedCustomersId.size() > 0) {
+                for (Long id : listOfSortedCustomersId) {
+                    for (Songs song : songsList) {
+                        if (song.getId() == id) {
+                            sortedSongs.add(song);
+                            songsList.remove(song);
+                            break;
+                        }
+                    }
+                }
+            }
+            //if there are still songs that were not in the sorted list
+            //maybe they were added after the last drag and drop
+            //add them to the sorted list
+            if (songsList.size() > 0) {
+                sortedSongs.addAll(songsList);
+            }
+            return sortedSongs;
+        } else {
+            return songsList;
+        }
     }
 
 
@@ -447,18 +496,22 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
         rv_Song = findViewById(R.id.rvMusicSong);
         seekBar = findViewById(R.id.seekbar);
         musicService = new MusicService();
-        songsList = new ArrayList<>();
+
+        animator = ObjectAnimator.ofFloat(iv_CircleMussic, "rotation", 0f, 360f);
+        animator.setDuration(10000);
+        animator.setRepeatCount(ValueAnimator.INFINITE);
+        animator.setRepeatMode(ValueAnimator.RESTART);
+        animator.setInterpolator(new LinearInterpolator());
+
+        sharedPreferences = this.getApplicationContext().getSharedPreferences(PREFERENCE_FILE, Context.MODE_PRIVATE);
+
+        songsList = getSampleData();
         songAdapter = new SongMusicAdapter(songsList, this);
         songAdapter.setClickListener(this);
         rv_Song.setAdapter(songAdapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         rv_Song.setLayoutManager(layoutManager);
-        animator = ObjectAnimator.ofFloat(iv_CircleMussic, "rotation", 0f, 360f);
-        animator.setDuration(10000);
-        animator.setRepeatCount(ValueAnimator.INFINITE);
-        animator.setRepeatMode(ValueAnimator.RESTART);
-        animator.setInterpolator(new LinearInterpolator());
     }
 
     //click adapter
@@ -466,7 +519,9 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
     public void onItemClick(View song, int position) {
         musicService.setSong(position);
         musicService.playSong();
-
-
+        if(musicService.isPng()){
+            iv_Pause.setVisibility(View.VISIBLE);
+            iv_Play.setVisibility(View.INVISIBLE);
+        }
     }
 }

@@ -60,10 +60,6 @@ public class SongPlayingQueueAdapter extends RecyclerView.Adapter<SongPlayingQue
         notifyItemMoved(fromPosition, toPosition);
     }
 
-    public void swipe(int position, int direction) {
-        songsList.remove(position);
-        notifyItemRemoved(position);
-    }
 
     public class RecyclerviewHolder extends RecyclerView.ViewHolder {
         ImageView iv_Beats;

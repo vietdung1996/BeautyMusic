@@ -16,6 +16,7 @@ import com.vietdung.beautymusic.R;
 import com.vietdung.beautymusic.activity.AlbumsActivity;
 import com.vietdung.beautymusic.model.Albums;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FragmentAlbumsAdapter extends RecyclerView.Adapter<FragmentAlbumsAdapter.RecyclerviewHolder> {
@@ -51,8 +52,6 @@ public class FragmentAlbumsAdapter extends RecyclerView.Adapter<FragmentAlbumsAd
                 context.startActivity(intent);
             }
         });
-
-
     }
 
     @Override
@@ -70,5 +69,11 @@ public class FragmentAlbumsAdapter extends RecyclerView.Adapter<FragmentAlbumsAd
             tvAlbumsAuthorName = itemView.findViewById(R.id.tvAlbumsAuthorName);
             tvAlbumsSong = itemView.findViewById(R.id.tvAlbumsSong);
         }
+    }
+
+    public void setfilter(List<Albums> listAlbums) {
+        albumsList = new ArrayList<>();
+        albumsList.addAll(listAlbums);
+        notifyDataSetChanged();
     }
 }

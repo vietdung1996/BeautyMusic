@@ -8,9 +8,16 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -33,6 +40,8 @@ public class FragmentAlbums extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_albums, container, false);
         rv_Albums = view.findViewById(R.id.rvAlbums);
+        setHasOptionsMenu(true);
+
         albumsList = new ArrayList<>();
         albumsAdapter = new FragmentAlbumsAdapter(albumsList, getActivity());
         getData();
@@ -70,5 +79,58 @@ public class FragmentAlbums extends Fragment {
         }
         albumsAdapter.notifyDataSetChanged();
 
+    }
+
+    //Listerner search view
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
+        inflater.inflate(R.menu.menu_main, menu);
+        final MenuItem item = menu.findItem(R.id.mnSearch);
+        final SearchView searchView = (SearchView) item.getActionView();
+        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        MenuItemCompat.setActionView(item, searchView);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                if (TextUtils.isEmpty(query)) {
+                    if (!searchView.isIconified()) {
+                        searchView.setIconified(true);
+                    }
+                    item.collapseActionView();
+                    return false;
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                String userInput = newText.toLowerCase();
+                List<Albums> newAlbumList = new ArrayList<>();
+                for (Albums albums : albumsList) {
+                    if (albums.getNameAuthor().toLowerCase().contains(userInput)) {
+                        newAlbumList.add(albums);
+                    }
+                }
+                albumsAdapter.setfilter(newAlbumList);
+                return true;
+            }
+        });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.mn_gvsongs:
+                rv_Albums.setLayoutManager(new GridLayoutManager(getActivity(), numberofColumns));
+                break;
+            case R.id.mn_lvsongs:
+                LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+                layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+                rv_Albums.setLayoutManager(layoutManager);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

@@ -15,6 +15,15 @@ public class NotificationPlayHandler extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         MusicService musicService = MainActivity.musicService;
-        musicService.pauseSong();
+        if(musicService!=null){
+            if(musicService.isPng()){
+                musicService.pauseSong();
+            }else{
+                musicService.pauseToPlaySong();
+            }
+
+        }
+
+
     }
 }

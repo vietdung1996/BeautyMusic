@@ -1,7 +1,6 @@
 package com.vietdung.beautymusic.activity;
 
 import android.content.ContentResolver;
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,10 +9,10 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,22 +23,15 @@ import android.view.ViewGroup;
 import com.vietdung.beautymusic.R;
 import com.vietdung.beautymusic.adapter.FragmentSongAdapter;
 import com.vietdung.beautymusic.model.Songs;
-import com.vietdung.beautymusic.presenter.ViewFragmentSong;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.util.Locale.filter;
-
 public class FragmentSongs extends Fragment  {
-    private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
-    // private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = ;
     RecyclerView rv_Songs;
     List<Songs> songsList;
     FragmentSongAdapter songAdapter;
-    int numberofColumns = 1;
-    Intent playIntent;
-    boolean musicBound = false;
+    int numberofColumns = 2;
 
     @Nullable
     @Override
@@ -47,26 +39,22 @@ public class FragmentSongs extends Fragment  {
         View view = inflater.inflate(R.layout.fragment_songs, container, false);
         rv_Songs = view.findViewById(R.id.rvSongs);
         setHasOptionsMenu(true);
-        //PresenterLogicFragmentSong presenterLogicFragmentSong = new PresenterLogicFragmentSong((PresenterImpFragmentSong) this,getActivity());
         songsList = new ArrayList<>();
         songAdapter = new FragmentSongAdapter(songsList, getActivity());
         getData();
-
         rv_Songs.setAdapter(songAdapter);
-        rv_Songs.setLayoutManager(new GridLayoutManager(getActivity(), numberofColumns));
-
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        rv_Songs.setLayoutManager(layoutManager);
         return view;
 
     }
-
-
 
     public void getData() {
         //songAdapter.notifyDataSetChanged();
         ContentResolver cr = getActivity().getContentResolver();
         Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         Cursor musicCursor = cr.query(musicUri, null, null, null, null);
-
         if (musicCursor != null && musicCursor.moveToFirst()) {
             //get columns
             int titleColumn = musicCursor.getColumnIndex
@@ -77,7 +65,6 @@ public class FragmentSongs extends Fragment  {
                     (MediaStore.Audio.Media.ARTIST);
             int albumsColums = musicCursor.getColumnIndex
                     (MediaStore.Audio.Media.ALBUM_ID);
-
             //add songs to list
             do {
                 int thisId = musicCursor.getInt(idColumn);
@@ -92,8 +79,6 @@ public class FragmentSongs extends Fragment  {
 
 
     }
-
-
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -127,13 +112,24 @@ public class FragmentSongs extends Fragment  {
                     }
                 }
                 songAdapter.setfilter(newsongList);
-
-                Log.d("new song List", "null "+newsongList);
-                //songAdapter.notifyDataSetChanged();
                 return true;
-
             }
         });
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.mn_lvsongs:
+                LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+                layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+                rv_Songs.setLayoutManager(layoutManager);
+                break;
+            case R.id.mn_gvsongs:
+                rv_Songs.setAdapter(songAdapter);
+                rv_Songs.setLayoutManager(new GridLayoutManager(getActivity(), numberofColumns));
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }

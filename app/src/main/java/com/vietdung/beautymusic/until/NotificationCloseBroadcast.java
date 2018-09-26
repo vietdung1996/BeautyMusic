@@ -5,15 +5,13 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.vietdung.beautymusic.activity.MainActivity;
-import com.vietdung.beautymusic.activity.PlayMussicActivity;
 
-public class NotificationNextBroadcast extends BroadcastReceiver {
+public class NotificationCloseBroadcast extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        MusicService musicService = MainActivity.musicService;
-        if(musicService!=null){
-            musicService.nextSong();
-        }
-
+       MusicService musicService = MainActivity.musicService;
+       if(musicService!=null) {
+           musicService.cancelNotification();
+       }
     }
 }

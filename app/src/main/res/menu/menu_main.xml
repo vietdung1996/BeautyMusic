@@ -3,13 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:title="Listview"
-        android:id="@+id/lvsongs"
+        android:id="@+id/mn_lvsongs"
         app:showAsAction="never">
 
     </item>
     <item
         android:title="Gridview"
-        android:id="@+id/gvsongs"
+        android:id="@+id/mn_gvsongs"
         app:showAsAction="never">
 
     </item>

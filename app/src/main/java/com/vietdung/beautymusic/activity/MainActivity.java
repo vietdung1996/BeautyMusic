@@ -9,10 +9,12 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
@@ -23,6 +25,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -46,17 +49,27 @@ public class MainActivity extends AppCompatActivity {
     List<Songs> songsList;
     public static Intent playIntent;
     boolean musicBound = false;
-    private ServiceConnection musicConnection = new ServiceConnection() {
+    private String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE};
 
+
+    private ServiceConnection musicConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             MusicService.MusicBinder binder = (MusicService.MusicBinder) service;
             //get service
-            musicService = binder.getService();
+            if(musicService==null){
+                musicService = binder.getService();
+            }
+
             //pass list
             musicService.setList(songsList);
-
             musicBound = true;
+            if(musicService!=null&&musicBound){
+                if(musicService.isRunBackground()==true){
+                    musicService.setRunBackground(false);
+                }
+
+            }
         }
 
         @Override
@@ -69,24 +82,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-
-            } else {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-            }
-
-        } else {
-            initView();
-        }
         if (playIntent == null) {
             playIntent = new Intent(this, MusicService.class);
             bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
             startService(playIntent);
         }
+
+        if (!checkPermissions()) {
+            return;
+        }
+
+
+        initView();
+
         addEvents();
 
 
@@ -102,30 +110,12 @@ public class MainActivity extends AppCompatActivity {
         getData();
         setToolbar();
         updateTimeSong();
-
     }
 
     private void setToolbar() {
         setSupportActionBar(tb_main);
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    {
-                        if (ContextCompat.checkSelfPermission(getApplicationContext(),
-                                Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-
-                        } else {
-                            initView();
-                        }
-                    }
-                    return;
-                }
-        }
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -136,10 +126,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.lvsongs:
-                break;
-            case R.id.gvsongs:
-                break;
+
         }
         return super.onOptionsItemSelected(item);
     }
@@ -154,7 +141,6 @@ public class MainActivity extends AppCompatActivity {
         iv_Pause = findViewById(R.id.ivPauseBottom);
         songsList = new ArrayList<>();
 
-
         FragmentManager manager = getSupportFragmentManager();
         PagerAdapter adapter = new com.vietdung.beautymusic.adapter.PagerAdapter(manager);
         viewPager.setAdapter(adapter);
@@ -162,36 +148,51 @@ public class MainActivity extends AppCompatActivity {
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.setTabsFromPagerAdapter(adapter);//deprecated
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
+
+
     }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
+        if(musicService!=null&&musicBound){
+            musicService.setRunBackground(true);
+
+
+        }
+        musicService=null;
         unbindService(musicConnection);
-//        Intent intent = new Intent();
-//        intent.setAction("CancelNotifi");
-//                sendBroadcast(intent);
-        // Log.d("destroy"," true");
+
+        super.onDestroy();
     }
 
     @Override
     protected void onResume() {
         //super.onStop();
-        super.onResume();
+
         // Log.d("stop", "onStop: ");
-        if (musicService != null) {
+        if (musicService != null&&musicBound) {
             setDisplayMusicBottom();
         }
+        super.onResume();
     }
 
     public void setDisplayMusicBottom() {
-        //int position = musicService.getPosition();
-        //Log.d("Namesong", " "+songsList.get(position).getNameSong());
-        // Log.d("NameAritis", " "+musicService.getNameArtist());
         if (musicService.isPng()) {
             tv_SongBottom.setText(musicService.getNameSong());
             tv_ArtistBottom.setText(musicService.getNameArtist());
             seekBarBottom.setMax(musicService.getTimeTotal());
+            iv_Pause.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(musicService.isPng()){
+                        musicService.pauseSong();
+                        iv_Pause.setImageResource(R.drawable.play);
+                    }else{
+                        musicService.pauseToPlaySong();
+                        iv_Pause.setImageResource(R.drawable.pause);
+                    }
+                }
+            });
             seekBarBottom.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -206,11 +207,9 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onStopTrackingTouch(SeekBar seekBar) {
                     musicService.seekTo(seekBar.getProgress());
-
                 }
 
             });
-
         }
     }
 
@@ -261,5 +260,28 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
+    }
+
+    private boolean checkPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            for (String check : permissions) {
+                int status = checkSelfPermission(check);
+                if (status == PackageManager.PERMISSION_DENIED) {
+                    requestPermissions(permissions, 0);
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (checkPermissions()) {
+
+        } else {
+            finish();
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }

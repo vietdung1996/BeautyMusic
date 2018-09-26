@@ -19,8 +19,10 @@ import android.os.PowerManager;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.widget.RemoteViews;
 
 import com.vietdung.beautymusic.R;
+import com.vietdung.beautymusic.activity.MainActivity;
 import com.vietdung.beautymusic.activity.PlayMussicActivity;
 import com.vietdung.beautymusic.adapter.FragmentSongAdapter;
 import com.vietdung.beautymusic.model.Songs;
@@ -30,11 +32,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class MusicService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener
-        , MediaPlayer.OnCompletionListener {
+public class MusicService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener {
     MediaPlayer mediaPlayer;
     List<Songs> songsList;
-    List<Songs> songsListAll;
     int position;
     int idSong;
     private final IBinder musicBind = new MusicBinder();
@@ -43,6 +43,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     private boolean shuffle = false;
     private boolean repeat = false;
     private Random random;
+    Notification notification;
+
+    private boolean isRunBackground = false;
+    private boolean isRestartNotifi = false;
 
     @Nullable
     @Override
@@ -99,11 +103,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     }
 
     @Override
-    public void onCompletion(MediaPlayer mp) {
-        nextSong();
-    }
-
-    @Override
     public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
         return false;
     }
@@ -135,13 +134,18 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         }
         mediaPlayer.start();
         notification();
-        //autoNextSong();
     }
 
     public void autoNextSong() {
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             public void onCompletion(MediaPlayer mp) {
                 nextSong();
+                if (isRunBackground){
+                    mediaPlayer.stop();
+                    mediaPlayer.release();
+                    stopSelf();
+                }
+
             }
         });
     }
@@ -183,8 +187,15 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public void pauseSong() {
         if (mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
-        } else {
+        }
+    }
+
+    public void pauseToPlaySong(){
+        if(mediaPlayer.isPlaying()==false){
             mediaPlayer.start();
+            if(isRestartNotifi){
+                notification();
+            }
         }
     }
 
@@ -210,14 +221,11 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     public int getPosition() {
         return position;
-
     }
 
     public int getId() {
         return idSong;
     }
-
-
 
     public int getTimeTotal() {
         return mediaPlayer.getDuration();
@@ -226,8 +234,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public boolean isPng() {
         return mediaPlayer.isPlaying();
     }
-
-
 
     public void seekTo(int pons) {
         mediaPlayer.seekTo(pons);
@@ -244,124 +250,85 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         i.putExtra(PlayMussicActivity.rq_notification,3000);
         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
+        RemoteViews notificationView = new RemoteViews(this.getPackageName(),R.layout.custom_notification);
+        RemoteViews notificationViewSmall = new RemoteViews(this.getPackageName(),R.layout.custom_notification_lock_screen);
+        notificationView.setTextViewText(R.id.noti_track_name,songsList.get(position).getNameSong());
+        notificationView.setTextViewText(R.id.noti_artist_name,songsList.get(position).getNameAuthor());
+        notificationViewSmall.setTextViewText(R.id.tv_track,songsList.get(position).getNameSong());
+        notificationViewSmall.setTextViewText(R.id.tv_artist,songsList.get(position).getNameAuthor());
+
         //Button play
         Intent btnPlayIntent = new Intent(this, NotificationPlayHandler.class);
         PendingIntent btnPlayPendingIntent = PendingIntent.getBroadcast(this, 0, btnPlayIntent, 0);
-        // Back song
+        notificationView.setOnClickPendingIntent(R.id.noti_play,btnPlayPendingIntent);
+        notificationViewSmall.setOnClickPendingIntent(R.id.iv_play,btnPlayPendingIntent);
+//        // Back song
         Intent btnBackIntent = new Intent(this, NotificationPrevBroadcast.class);
         PendingIntent btnBackPendingIntent = PendingIntent.getBroadcast(this, 0, btnBackIntent, 0);
-        //
-        Intent btnNextIntent = new Intent(this, NotificationNextBroadcast.class);
+        notificationView.setOnClickPendingIntent(R.id.noti_prev,btnBackPendingIntent);
+        notificationViewSmall.setOnClickPendingIntent(R.id.iv_back,btnBackPendingIntent);
+//        //next song
+        Intent btnNextIntent = new Intent(this,NotificationNextBroadcast.class);
         PendingIntent btnNextPendingIntent = PendingIntent.getBroadcast(this, 0, btnNextIntent, 0);
-        //i.putExtra()
+        notificationView.setOnClickPendingIntent(R.id.noti_next,btnNextPendingIntent);
+        notificationViewSmall.setOnClickPendingIntent(R.id.iv_next,btnNextPendingIntent);
+        //Close notification when music pause
+        Intent btnCloseIntent= new Intent(this, NotificationCloseBroadcast.class);
+        PendingIntent btnClose = PendingIntent.getBroadcast(this, 0, btnCloseIntent, 0);
+        notificationView.setOnClickPendingIntent(R.id.noti_close,btnClose);
+        //notificationViewSmall.setOnClickPendingIntent(R.id.iv_next,btnNextPendingIntent);
+
         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), (int) System.currentTimeMillis(), i, PendingIntent.FLAG_UPDATE_CURRENT);
-        Notification.Builder builder = new Notification.Builder(this);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder.setContentTitle(songsList.get(position).getNameSong())
-                    .setVisibility(Notification.VISIBILITY_PUBLIC)
-                    .setContentText(songsList.get(position).getNameAuthor())
-                    .setSmallIcon(R.drawable.music)
-                    .setContentIntent(pendingIntent)
-                    //.setLargeIcon()
-                    .setAutoCancel(true)
-                    .addAction(R.drawable.back, "Back", btnBackPendingIntent)
-                    .addAction(R.drawable.pause, "Pause", btnPlayPendingIntent)
-                    .addAction(R.drawable.next, "Next", btnNextPendingIntent).build();
+
+        notification = new Notification.Builder(this).build();
+        notification.bigContentView = notificationView;
+        notification.contentView =  notificationViewSmall;
+        notification.flags = Notification.FLAG_ONGOING_EVENT;
+        notification.icon = R.drawable.ic_launcher;
+        notification.contentIntent = pendingIntent;
+
+        startForeground(NOTIFY_ID, notification);
+    }
+
+    public void cancelNotification(){
+        if(!isPng()){
+            isRestartNotifi = true;
+            stopForeground(true);
         }
-        Notification not = builder.build();
 
-        startForeground(NOTIFY_ID, not);
+
+
     }
 
-    public void cancelNotifi() {
-        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
-                Log.d("Cancelnoti", "true");
-                mediaPlayer.release();
 
-                stopSelf();
-                //stopForeground(true);
-            }
-        });
-    }
 
-    public class CancelNotificationBroadcast extends BroadcastReceiver {
-        @Override
-        public void onReceive(final Context context, Intent intent) {
-//            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-//                @Override
-//                public void onCompletion(MediaPlayer mediaPlayer) {
-//                    Log.d("Cancelnoti", "true");
-//                    mediaPlayer.release();
-//
-//                }
-//            });
-        }
-    }
 
 
     public String getNameSong() {
-        String nameSong = "";
-        getSongListAll();
-        if (songsList.size() > 0) {
-            for (int i = 0; i < songsListAll.size(); i++) {
-                if (idSong == songsListAll.get(i).getId()) {
-                    nameSong = songsListAll.get(i).getNameSong();
-                }
-            }
-            //nameSong = songsList.get(position).getNameSong();
-            //nameAritst = songsList.get(position).getNameAuthor();
-        }
-
+        String nameSong = songsList.get(position).getNameSong();
         return nameSong;
-
     }
 
-    public String getNameArtist() {
-        String nameAritst = "";
-        getSongListAll();
-        if (songsList.size() > 0) {
-            for (int i = 0; i < songsListAll.size(); i++) {
-                if (idSong == songsListAll.get(i).getId()) {
-                    nameAritst = songsListAll.get(i).getNameAuthor();
-                }
-            }
-
-        }
-
+   public String getNameArtist() {
+        String nameAritst = songsList.get(position).getNameAuthor();
         return nameAritst;
-
     }
 
-    public void getSongListAll() {
-        songsListAll = new ArrayList<>();
-        ContentResolver cr = getContentResolver();
-        Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        Cursor musicCursor = cr.query(musicUri, null, null, null, null);
+    public boolean isRunBackground() {
+        return isRunBackground;
+    }
 
-        if (musicCursor != null && musicCursor.moveToFirst()) {
-            //get columns
-            int titleColumn = musicCursor.getColumnIndex
-                    (android.provider.MediaStore.Audio.Media.TITLE);
-            int idColumn = musicCursor.getColumnIndex
-                    (android.provider.MediaStore.Audio.Media._ID);
-            int artistColumn = musicCursor.getColumnIndex
-                    (android.provider.MediaStore.Audio.Media.ARTIST);
-            int albumsColums = musicCursor.getColumnIndex
-                    (MediaStore.Audio.Media.ALBUM_ID);
-            //add songs to list
-            do {
-                int thisId = musicCursor.getInt(idColumn);
-                String thisTitle = musicCursor.getString(titleColumn);
-                String thisArtist = musicCursor.getString(artistColumn);
-                int idALbums = musicCursor.getInt(albumsColums);
-                songsListAll.add(new Songs(thisId, thisTitle, thisArtist, idALbums));
+    public void setRunBackground(boolean runBackground) {
+        isRunBackground = runBackground;
+    }
+
+    public static class NotificationClose1Broadcast extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            MusicService musicService = MainActivity.musicService;
+            if(musicService!=null) {
+                musicService.cancelNotification();
             }
-            while (musicCursor.moveToNext());
         }
     }
-
-
-
 }

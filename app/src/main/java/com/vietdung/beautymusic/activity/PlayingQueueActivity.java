@@ -1,7 +1,6 @@
 package com.vietdung.beautymusic.activity;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -30,10 +29,10 @@ public class PlayingQueueActivity extends AppCompatActivity implements OnCustome
     List<Songs> songsList;
     SongPlayingQueueAdapter songPlayingQueueAdapter;
     RecyclerView rv_Playing;
-    getDataSdCard getDataSdCard;
+
     public final static String rq_newList = "newlist";
     int screen = 0;
-
+    getDataSdCard getDataSdCard;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     public static final String LIST_OF_SORTED_DATA_ID = "json_list_sorted_data_id";
@@ -77,11 +76,7 @@ public class PlayingQueueActivity extends AppCompatActivity implements OnCustome
                 songPlayingQueueAdapter.onMove(oldPositoin, newPosition);
             }
 
-            @Override
-            public void swip(int position, int direction) {
-                songPlayingQueueAdapter.swipe(position, direction);
 
-            }
         });
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);

@@ -1,17 +1,12 @@
 package com.vietdung.beautymusic.activity;
 
-import android.content.ComponentName;
 import android.content.ContentResolver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -19,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -28,7 +24,6 @@ import com.vietdung.beautymusic.adapter.FragmentAlbumsAdapter;
 import com.vietdung.beautymusic.adapter.SongAlbum1Adapter;
 import com.vietdung.beautymusic.model.Albums;
 import com.vietdung.beautymusic.model.Songs;
-import com.vietdung.beautymusic.until.MusicService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -171,6 +166,18 @@ public class AlbumsActivity extends AppCompatActivity {
         if (MainActivity.musicService.isPng()) {
             tv_SongBottom.setText(MainActivity.musicService.getNameSong());
             tv_ArtistBottom.setText(MainActivity.musicService.getNameArtist());
+            iv_Pause.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(MainActivity.musicService.isPng()){
+                        MainActivity.musicService.pauseSong();
+                        iv_Pause.setImageResource(R.drawable.play);
+                    }else{
+                        MainActivity.musicService.pauseToPlaySong();
+                        iv_Pause.setImageResource(R.drawable.pause);
+                    }
+                }
+            });
             seekBarBottom.setMax(MainActivity.musicService.getTimeTotal());
             seekBarBottom.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override

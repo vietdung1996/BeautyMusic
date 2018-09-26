@@ -13,6 +13,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -38,13 +39,10 @@ public class ArtistsActivity extends AppCompatActivity {
     List<Songs> songsList;
     List<Albums> albumsList;
     SongArtistsAdapter songArtistsAdapter;
-    MusicService musicService;
 
     int idArtist = 0;
     String thisTitle = "";
-    String thisArtist = "";
-    String thisArt = "";
-    String thisIdAlbums = "";
+
 
 
     @Override
@@ -134,8 +132,7 @@ public class ArtistsActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         collapsingToolbarLayout.setTitle(thisTitle);
-//        Bitmap bitmap = BitmapFactory.decodeFile(thisArt);
-//        iv_Albums.setImageBitmap(bitmap);
+
     }
 
     @Override
@@ -176,6 +173,18 @@ public class ArtistsActivity extends AppCompatActivity {
 
                 }
 
+            });
+            iv_Pause.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(MainActivity.musicService.isPng()){
+                        MainActivity.musicService.pauseSong();
+                        iv_Pause.setImageResource(R.drawable.play);
+                    }else{
+                        MainActivity.musicService.pauseToPlaySong();
+                        iv_Pause.setImageResource(R.drawable.pause);
+                    }
+                }
             });
 
         }

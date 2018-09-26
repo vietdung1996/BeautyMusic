@@ -23,11 +23,7 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback{
         return false;
     }
 
-    @Override
-    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-        listenner.swip(viewHolder.getAdapterPosition(),direction);
 
-    }
 
     @Override
     public boolean isLongPressDragEnabled() {
@@ -36,6 +32,11 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback{
 
     @Override
     public boolean isItemViewSwipeEnabled() {
-        return true;
+        return false;
+    }
+
+    @Override
+    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+
     }
 }

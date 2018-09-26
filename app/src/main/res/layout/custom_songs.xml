@@ -20,6 +20,7 @@
         android:layout_toRightOf="@+id/ivBeats"
         android:layout_marginLeft="@dimen/margin5dp"
         android:layout_marginTop="@dimen/margin5dp"
+        android:singleLine="true"
         android:text="ABC"
         android:textSize="18dp"
         android:textColor="@color/colorPrimaryDark"/>
@@ -30,7 +31,7 @@
         android:layout_below="@+id/tvSongName"
         android:layout_toRightOf="@+id/ivBeats"
         android:layout_marginLeft="@dimen/margin5dp"
-        android:text="xyz"/>
+        android:singleLine="true"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="1dp"

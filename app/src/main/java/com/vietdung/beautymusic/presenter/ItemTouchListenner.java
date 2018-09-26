@@ -7,7 +7,4 @@ import java.util.List;
 public interface ItemTouchListenner {
     void onMode(int oldPositoin, int newPosition);
 
-    void swip(int position, int direction);
-
-
 }
