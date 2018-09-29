@@ -15,7 +15,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.vietdung.beautymusic.R;
 import com.vietdung.beautymusic.adapter.SongPlayingQueueAdapter;
-import com.vietdung.beautymusic.database.getDataSdCard;
+import com.vietdung.beautymusic.database.GetDataSdCard;
 import com.vietdung.beautymusic.model.Songs;
 import com.vietdung.beautymusic.presenter.ItemTouchListenner;
 import com.vietdung.beautymusic.presenter.SimpleItemTouchHelperCallback;
@@ -32,7 +32,7 @@ public class PlayingQueueActivity extends AppCompatActivity implements OnCustome
 
     public final static String rq_newList = "newlist";
     int screen = 0;
-    getDataSdCard getDataSdCard;
+    GetDataSdCard getDataSdCard;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     public static final String LIST_OF_SORTED_DATA_ID = "json_list_sorted_data_id";
@@ -124,7 +124,7 @@ public class PlayingQueueActivity extends AppCompatActivity implements OnCustome
 
     private List<Songs> getSampleData(){
         int screen = getIntent().getIntExtra(PlayMussicActivity.rq_screen, 0);
-        getDataSdCard = new getDataSdCard(this, screen);
+        getDataSdCard = new GetDataSdCard(this, screen);
         //Get the song data
         List<Songs> songsList = getDataSdCard.getData() ;
         //create an empty array to hold the list of sorted Customers

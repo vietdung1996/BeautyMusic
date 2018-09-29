@@ -1,10 +1,12 @@
 package com.vietdung.beautymusic.database;
 
 import android.app.Activity;
+import android.app.Service;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.app.Application;
 
 import com.vietdung.beautymusic.activity.PlayMussicActivity;
 import com.vietdung.beautymusic.adapter.SongAlbum1Adapter;
@@ -14,15 +16,26 @@ import com.vietdung.beautymusic.model.Songs;
 import java.util.ArrayList;
 import java.util.List;
 
-public class getDataSdCard {
+public class GetDataSdCard   {
+    private Service MusicService;
     Activity activity;
     int screen = 0;
 
 
-    public getDataSdCard(Activity activity, int screen) {
+    public GetDataSdCard(Activity activity, int screen) {
         this.activity = activity;
         this.screen = screen;
     }
+
+
+    public Service getMusicService() {
+        return MusicService;
+    }
+
+    public void setMusicService(Service musicService) {
+        MusicService = musicService;
+    }
+
 
     public List<Songs> getData() {
         List<Songs> songsList= new ArrayList<>();
@@ -141,9 +154,9 @@ public class getDataSdCard {
         return songsList;
     }
 
-    public List<Songs> getDataPlayMusic() {
+    public  List<Songs> getDataPlayMusic() {
         List<Songs> songsList= new ArrayList<>();
-        if (screen == 111) {
+        if ( screen == 111) {
             ContentResolver cr = activity.getContentResolver();
             Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
             Cursor musicCursor = cr.query(musicUri, null, null, null, null);

@@ -35,7 +35,7 @@ import com.vietdung.beautymusic.adapter.FragmentSongAdapter;
 import com.vietdung.beautymusic.adapter.SongAlbum1Adapter;
 import com.vietdung.beautymusic.adapter.SongArtistsAdapter;
 import com.vietdung.beautymusic.adapter.SongMusicAdapter;
-import com.vietdung.beautymusic.database.getDataSdCard;
+import com.vietdung.beautymusic.database.GetDataSdCard;
 import com.vietdung.beautymusic.model.Songs;
 import com.vietdung.beautymusic.until.MusicService;
 
@@ -66,7 +66,7 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
     int position = 0;
     int screen;
 
-    getDataSdCard getDataSdCard;
+    GetDataSdCard getDataSdCard;
     private SharedPreferences sharedPreferences;
     public static final String LIST_OF_SORTED_DATA_ID = "json_list_sorted_data_id";
     public final static String PREFERENCE_FILE = "preference_file";
@@ -275,8 +275,6 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
             @Override
             public void run() {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("mm:ss");
-                //tv_Time.setText(dateFormat.format(musicService.getCurrentPosition()));
-
                 if (musicService != null && musicBound && musicService.isPng()) {
                     tv_Time.setText(dateFormat.format(musicService.getCurrentPosition()));
                     seekBar.setProgress(musicService.getCurrentPosition());
@@ -436,14 +434,18 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
 
     protected void onDestroy() {
         //stopService(playIntent);
-        musicService = null;
+        if(musicService!=null&&musicBound){
+            musicService.setRunBackground(true);
+            Log.d("chay vao day", "onDestroy: ");
+        }
+       // musicService = null;
         unbindService(musicConnection);
         super.onDestroy();
     }
 
     private List<Songs> getSampleData() {
         screen = getIntent().getIntExtra(FragmentSongAdapter.rq_itent_screen, -1);
-        getDataSdCard = new getDataSdCard(this, screen);
+        getDataSdCard = new GetDataSdCard(this, screen);
         //Get the song data
         List<Songs> songsList = getDataSdCard.getDataPlayMusic();
         //create an empty array to hold the list of sorted Customers

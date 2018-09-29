@@ -45,6 +45,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     private Random random;
     Notification notification;
 
+    RemoteViews notificationView ;
+    RemoteViews notificationViewSmall;
+
     private boolean isRunBackground = false;
     private boolean isRestartNotifi = false;
 
@@ -188,6 +191,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         if (mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
         }
+        changePausePlay();
     }
 
     public void pauseToPlaySong(){
@@ -197,6 +201,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 notification();
             }
         }
+        changePausePlay();
     }
 
     public boolean setShuffle() {
@@ -250,12 +255,22 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         i.putExtra(PlayMussicActivity.rq_notification,3000);
         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-        RemoteViews notificationView = new RemoteViews(this.getPackageName(),R.layout.custom_notification);
-        RemoteViews notificationViewSmall = new RemoteViews(this.getPackageName(),R.layout.custom_notification_lock_screen);
+
+
+        notificationView = new RemoteViews(this.getPackageName(),R.layout.custom_notification);
+        notificationViewSmall = new RemoteViews(this.getPackageName(),R.layout.custom_notification_lock_screen);
         notificationView.setTextViewText(R.id.noti_track_name,songsList.get(position).getNameSong());
         notificationView.setTextViewText(R.id.noti_artist_name,songsList.get(position).getNameAuthor());
         notificationViewSmall.setTextViewText(R.id.tv_track,songsList.get(position).getNameSong());
         notificationViewSmall.setTextViewText(R.id.tv_artist,songsList.get(position).getNameAuthor());
+
+        if(mediaPlayer.isPlaying()){
+            notificationView.setImageViewResource(R.id.noti_play, R.drawable.apollo_holo_dark_pause);
+            notificationViewSmall.setImageViewResource(R.id.iv_play, R.drawable.pausetrack);
+        }else{
+            notificationView.setImageViewResource(R.id.noti_play, R.drawable.apollo_holo_dark_play);
+            notificationViewSmall.setImageViewResource(R.id.iv_play, R.drawable.playtrack);
+        }
 
         //Button play
         Intent btnPlayIntent = new Intent(this, NotificationPlayHandler.class);
@@ -276,7 +291,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         Intent btnCloseIntent= new Intent(this, NotificationCloseBroadcast.class);
         PendingIntent btnClose = PendingIntent.getBroadcast(this, 0, btnCloseIntent, 0);
         notificationView.setOnClickPendingIntent(R.id.noti_close,btnClose);
-        //notificationViewSmall.setOnClickPendingIntent(R.id.iv_next,btnNextPendingIntent);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), (int) System.currentTimeMillis(), i, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -290,19 +304,24 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         startForeground(NOTIFY_ID, notification);
     }
 
+    public void changePausePlay(){
+        if(mediaPlayer.isPlaying()){
+            notificationView.setImageViewResource(R.id.noti_play, R.drawable.apollo_holo_dark_pause);
+            notificationViewSmall.setImageViewResource(R.id.iv_play, R.drawable.pausetrack);
+        }else{
+            notificationView.setImageViewResource(R.id.noti_play, R.drawable.apollo_holo_dark_play);
+            notificationViewSmall.setImageViewResource(R.id.iv_play, R.drawable.playtrack);
+        }
+        startForeground(NOTIFY_ID,notification);
+    }
+
     public void cancelNotification(){
         if(!isPng()){
             isRestartNotifi = true;
             stopForeground(true);
         }
 
-
-
     }
-
-
-
-
 
     public String getNameSong() {
         String nameSong = songsList.get(position).getNameSong();
@@ -322,13 +341,5 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         isRunBackground = runBackground;
     }
 
-    public static class NotificationClose1Broadcast extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            MusicService musicService = MainActivity.musicService;
-            if(musicService!=null) {
-                musicService.cancelNotification();
-            }
-        }
-    }
+
 }

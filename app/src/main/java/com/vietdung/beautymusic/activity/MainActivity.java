@@ -16,13 +16,12 @@ import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,14 +30,15 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.vietdung.beautymusic.R;
+import com.vietdung.beautymusic.database.GetDataSdCard;
 import com.vietdung.beautymusic.model.Songs;
+import com.vietdung.beautymusic.until.AppController;
 import com.vietdung.beautymusic.until.MusicService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
     ViewPager viewPager;
     TabLayout tabLayout;
     Toolbar tb_main;
@@ -57,18 +57,15 @@ public class MainActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName name, IBinder service) {
             MusicService.MusicBinder binder = (MusicService.MusicBinder) service;
             //get service
-            if(musicService==null){
                 musicService = binder.getService();
-            }
-
             //pass list
+            AppController.getInstance().setMusicService(musicService);
             musicService.setList(songsList);
             musicBound = true;
             if(musicService!=null&&musicBound){
                 if(musicService.isRunBackground()==true){
                     musicService.setRunBackground(false);
                 }
-
             }
         }
 
@@ -82,28 +79,24 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        if (playIntent == null) {
-            playIntent = new Intent(this, MusicService.class);
-            bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
-            startService(playIntent);
-        }
+        //AppController.getInstance().setMainActivity(this);
+       // musicService= (MusicService) AppController.getInstance().getMusicService();
 
         if (!checkPermissions()) {
             return;
         }
-
-
         initView();
-
         addEvents();
-
-
     }
 
     @Override
     public void onStart() {
         super.onStart();
-
+        if (playIntent == null) {
+            playIntent = new Intent(this, MusicService.class);
+            bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
+            startService(playIntent);
+        }
     }
 
     private void addEvents() {
@@ -123,13 +116,6 @@ public class MainActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     private void initView() {
         viewPager = findViewById(R.id.viewPager);
@@ -156,20 +142,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         if(musicService!=null&&musicBound){
             musicService.setRunBackground(true);
-
-
+           // Log.d("chay vao day", "onDestroy: ");
         }
         musicService=null;
-        unbindService(musicConnection);
+        if (musicBound) {
+            unbindService(musicConnection);
+             musicBound = false;
+        }
 
         super.onDestroy();
     }
 
     @Override
     protected void onResume() {
-        //super.onStop();
-
-        // Log.d("stop", "onStop: ");
         if (musicService != null&&musicBound) {
             setDisplayMusicBottom();
         }
@@ -214,12 +199,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateTimeSong() {
+
         final Handler handler = new Handler();
+
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 if (musicService != null && musicBound && musicService.isPng()) {
-                    //tv_Time.setText(dateFormat.format(musicService.getCurrentPosition()));
                     seekBarBottom.setProgress(musicService.getCurrentPosition());
                     tv_SongBottom.setText(musicService.getNameSong());
                     tv_ArtistBottom.setText(musicService.getNameArtist());

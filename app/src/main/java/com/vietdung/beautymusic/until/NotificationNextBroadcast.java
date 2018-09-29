@@ -11,8 +11,11 @@ public class NotificationNextBroadcast extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         MusicService musicService = MainActivity.musicService;
+        MusicService musicService1 = (MusicService) AppController.getInstance().getMusicService();
         if(musicService!=null){
             musicService.nextSong();
+        }else{
+            musicService1.nextSong();
         }
 
     }

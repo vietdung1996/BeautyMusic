@@ -196,7 +196,6 @@ public class ArtistsActivity extends AppCompatActivity {
             @Override
             public void run() {
                 if (MainActivity.musicService != null && MainActivity.musicService.isPng()) {
-                    //tv_Time.setText(dateFormat.format(musicService.getCurrentPosition()));
                     seekBarBottom.setProgress(MainActivity.musicService.getCurrentPosition());
                     MainActivity.musicService.autoNextSong();
                     tv_SongBottom.setText(MainActivity.musicService.getNameSong());
