@@ -197,7 +197,7 @@ public class ArtistsActivity extends AppCompatActivity {
             public void run() {
                 if (MainActivity.musicService != null && MainActivity.musicService.isPng()) {
                     seekBarBottom.setProgress(MainActivity.musicService.getCurrentPosition());
-                    MainActivity.musicService.autoNextSong();
+                   // MainActivity.musicService.autoNextSong();
                     tv_SongBottom.setText(MainActivity.musicService.getNameSong());
                     tv_ArtistBottom.setText(MainActivity.musicService.getNameArtist());
                 }

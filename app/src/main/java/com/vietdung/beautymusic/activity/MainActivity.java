@@ -57,7 +57,10 @@ public class MainActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName name, IBinder service) {
             MusicService.MusicBinder binder = (MusicService.MusicBinder) service;
             //get service
+            if(musicService==null){
                 musicService = binder.getService();
+            }
+
             //pass list
             AppController.getInstance().setMusicService(musicService);
             musicService.setList(songsList);
@@ -81,6 +84,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         //AppController.getInstance().setMainActivity(this);
        // musicService= (MusicService) AppController.getInstance().getMusicService();
+        if (playIntent == null) {
+            playIntent = new Intent(this, MusicService.class);
+            bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
+            startService(playIntent);
+        }
 
         if (!checkPermissions()) {
             return;
@@ -92,17 +100,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-        if (playIntent == null) {
-            playIntent = new Intent(this, MusicService.class);
-            bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
-            startService(playIntent);
-        }
     }
 
     private void addEvents() {
         getData();
         setToolbar();
-        updateTimeSong();
+
+
+       updateTimeSong();
     }
 
     private void setToolbar() {
@@ -140,14 +145,18 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        if(musicService!=null&&musicBound){
+        if(musicService!=null){
             musicService.setRunBackground(true);
-           // Log.d("chay vao day", "onDestroy: ");
+            Log.d("chay vao day main", "onDestroy: ");
+        }else{
+            MusicService musicService1 = (MusicService) AppController.getInstance().getMusicService();
+            musicService1.setRunBackground(true);
         }
+        Log.d("service max ngu", "onDestroy: ");
         musicService=null;
         if (musicBound) {
             unbindService(musicConnection);
-             musicBound = false;
+            musicBound = false;
         }
 
         super.onDestroy();
@@ -205,7 +214,7 @@ public class MainActivity extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (musicService != null && musicBound && musicService.isPng()) {
+                if (musicService != null && musicBound && musicService.isPng()  ) {
                     seekBarBottom.setProgress(musicService.getCurrentPosition());
                     tv_SongBottom.setText(musicService.getNameSong());
                     tv_ArtistBottom.setText(musicService.getNameArtist());

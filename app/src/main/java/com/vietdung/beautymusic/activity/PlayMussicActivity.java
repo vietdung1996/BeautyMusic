@@ -119,6 +119,7 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
     private void addEvents() {
         getPosition();
         setButtonClick();
+
         updateTimeSong();
     }
 
@@ -275,6 +276,7 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
             @Override
             public void run() {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("mm:ss");
+
                 if (musicService != null && musicBound && musicService.isPng()) {
                     tv_Time.setText(dateFormat.format(musicService.getCurrentPosition()));
                     seekBar.setProgress(musicService.getCurrentPosition());
@@ -433,12 +435,7 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
     }
 
     protected void onDestroy() {
-        //stopService(playIntent);
-        if(musicService!=null&&musicBound){
-            musicService.setRunBackground(true);
-            Log.d("chay vao day", "onDestroy: ");
-        }
-       // musicService = null;
+        musicService = null;
         unbindService(musicConnection);
         super.onDestroy();
     }
@@ -504,6 +501,7 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
         animator.setRepeatCount(ValueAnimator.INFINITE);
         animator.setRepeatMode(ValueAnimator.RESTART);
         animator.setInterpolator(new LinearInterpolator());
+        animator.start();
 
         sharedPreferences = this.getApplicationContext().getSharedPreferences(PREFERENCE_FILE, Context.MODE_PRIVATE);
 

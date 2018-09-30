@@ -60,10 +60,11 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     @Override
     public void onCreate() {
         super.onCreate();
-        position = 0;
-        idSong = 0;
+        position = -1;
+        idSong = -1;
         mediaPlayer = new MediaPlayer();
         random = new Random();
+     //   mediaPlayer.setOnCompletionListener(this);
         // mediaPlayer.setOnCompletionListener(this);
         //playSong();
         initMusicPlay();
@@ -98,6 +99,17 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public void setList(List<Songs> songsList) {
         this.songsList = songsList;
     }
+
+//    @Override
+//    public void onCompletion(MediaPlayer mediaPlayer) {
+//        nextSong();
+//        if (isRunBackground){
+//            mediaPlayer.stop();
+//            mediaPlayer.release();
+//            stopSelf();
+//        }
+//
+//    }
 
     public class MusicBinder extends Binder {
         public MusicService getService() {
@@ -340,6 +352,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public void setRunBackground(boolean runBackground) {
         isRunBackground = runBackground;
     }
+
 
 
 }
