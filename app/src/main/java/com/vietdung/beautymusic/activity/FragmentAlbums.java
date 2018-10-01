@@ -109,7 +109,7 @@ public class FragmentAlbums extends Fragment {
                 String userInput = newText.toLowerCase();
                 List<Albums> newAlbumList = new ArrayList<>();
                 for (Albums albums : albumsList) {
-                    if (albums.getNameAuthor().toLowerCase().contains(userInput)) {
+                    if (albums.getNameAlbums().toLowerCase().contains(userInput)) {
                         newAlbumList.add(albums);
                     }
                 }

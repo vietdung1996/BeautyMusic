@@ -16,6 +16,7 @@ public class NotificationPlayHandler extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         MusicService musicService = MainActivity.musicService;
         MusicService musicService1 = (MusicService) AppController.getInstance().getMusicService();
+        PlayMussicActivity playMussicActivity = (PlayMussicActivity) AppController.getInstance().getPlayMucsicActivity();
         if(musicService!=null){
             if(musicService.isPng()){
                 musicService.pauseSong();
@@ -30,6 +31,11 @@ public class NotificationPlayHandler extends BroadcastReceiver {
                 musicService1.pauseToPlaySong();
             }
         }
+        if(playMussicActivity!=null){
+            playMussicActivity.updatePlayorPause();
+        }
+
+
 
 
     }

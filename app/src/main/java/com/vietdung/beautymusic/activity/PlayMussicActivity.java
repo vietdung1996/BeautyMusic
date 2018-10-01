@@ -18,7 +18,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,6 +36,7 @@ import com.vietdung.beautymusic.adapter.SongArtistsAdapter;
 import com.vietdung.beautymusic.adapter.SongMusicAdapter;
 import com.vietdung.beautymusic.database.GetDataSdCard;
 import com.vietdung.beautymusic.model.Songs;
+import com.vietdung.beautymusic.until.AppController;
 import com.vietdung.beautymusic.until.MusicService;
 
 import java.text.SimpleDateFormat;
@@ -119,7 +119,6 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
     private void addEvents() {
         getPosition();
         setButtonClick();
-
         updateTimeSong();
     }
 
@@ -150,6 +149,7 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
                     iv_Pause.setVisibility(View.INVISIBLE);
                     iv_Play.setVisibility(View.VISIBLE);
                     setPlayingMusic();
+                    animator.pause();
                 }
 
             }
@@ -162,6 +162,7 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
                     iv_Pause.setVisibility(View.VISIBLE);
                     iv_Play.setVisibility(View.INVISIBLE);
                     setPlayingMusic();
+                    animator.resume();
                 }
 
             }
@@ -174,6 +175,7 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
                 musicService.backSong();
                 position = musicService.getPosition();
                 setPlayingMusic();
+                animator.start();
             }
         });
         btn_Next.setOnClickListener(new View.OnClickListener() {
@@ -184,6 +186,7 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
                 musicService.nextSong();
                 position = musicService.getPosition();
                 setPlayingMusic();
+                animator.start();
             }
         });
         iv_Repeat.setOnClickListener(new View.OnClickListener() {
@@ -257,7 +260,7 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
     private void setPlayingMusic() {
         for (int i = 0; i < songsList.size(); i++) {
             if (musicService.getId() == songsList.get(i).getId()) {
-                Log.d("idsong ", " " + musicService.getId() + " " + i);
+                // Log.d("idsong ", " " + musicService.getId() + " " + i);
                 getSupportActionBar().setTitle(songsList.get(i).getNameSong());
             }
         }
@@ -512,6 +515,7 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         rv_Song.setLayoutManager(layoutManager);
+        AppController.getInstance().setPlayMusicActivity(this);
     }
 
     //click adapter
@@ -522,6 +526,51 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
         if(musicService.isPng()){
             iv_Pause.setVisibility(View.VISIBLE);
             iv_Play.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    public void updatePlayorPause() {
+        if (musicService != null && musicService.isPng()) {
+           // musicService.pauseSong();
+            iv_Pause.setVisibility(View.VISIBLE);
+            iv_Play.setVisibility(View.INVISIBLE);
+            setPlayingMusic();
+            animator.resume();
+        }
+
+        if (musicService != null && !musicService.isPng()) {
+           // musicService.pauseToPlaySong();
+            iv_Pause.setVisibility(View.INVISIBLE);
+            iv_Play.setVisibility(View.VISIBLE);
+            setPlayingMusic();
+            animator.pause();
+        }
+
+    }
+
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        songsList = getSampleData();
+        songAdapter = new SongMusicAdapter(songsList, this);
+        songAdapter.setClickListener(this);
+        rv_Song.setAdapter(songAdapter);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        rv_Song.setLayoutManager(layoutManager);
+        if (musicService != null) {
+            musicService.setList(songsList);
+        }
+        MusicService musicService1 = (MusicService) AppController.getInstance().getMusicService();
+        if(musicService1!=null){
+            if(musicService1.isPng()){
+                animator.resume();
+            }
+
+        }else{
+            animator.pause();
         }
     }
 }

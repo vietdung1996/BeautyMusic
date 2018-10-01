@@ -23,14 +23,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.vietdung.beautymusic.R;
-import com.vietdung.beautymusic.database.GetDataSdCard;
 import com.vietdung.beautymusic.model.Songs;
 import com.vietdung.beautymusic.until.AppController;
 import com.vietdung.beautymusic.until.MusicService;
@@ -60,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
             if(musicService==null){
                 musicService = binder.getService();
             }
-
             //pass list
             AppController.getInstance().setMusicService(musicService);
             musicService.setList(songsList);
@@ -82,14 +79,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //AppController.getInstance().setMainActivity(this);
-       // musicService= (MusicService) AppController.getInstance().getMusicService();
-        if (playIntent == null) {
-            playIntent = new Intent(this, MusicService.class);
-            bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
-            startService(playIntent);
-        }
-
         if (!checkPermissions()) {
             return;
         }
@@ -100,14 +89,25 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
+        if (playIntent == null) {
+            playIntent = new Intent(this, MusicService.class);
+            bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
+            startService(playIntent);
+            //Log.d("service onstart", "onStart: ");
+        }else if(playIntent!=null){
+           // Log.d("playintent", "onStart: ");
+        }
+
+        if (musicService != null&&musicBound) {
+            setDisplayMusicBottom();
+        }
+
     }
 
     private void addEvents() {
         getData();
         setToolbar();
-
-
-       updateTimeSong();
+        updateTimeSong();
     }
 
     private void setToolbar() {
@@ -147,17 +147,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         if(musicService!=null){
             musicService.setRunBackground(true);
-            Log.d("chay vao day main", "onDestroy: ");
+           // Log.d("chay vao day main", "onDestroy: ");
         }else{
             MusicService musicService1 = (MusicService) AppController.getInstance().getMusicService();
             musicService1.setRunBackground(true);
         }
-        Log.d("service max ngu", "onDestroy: ");
+        //Log.d("service max ngu", "onDestroy: ");
         musicService=null;
         if (musicBound) {
             unbindService(musicConnection);
             musicBound = false;
         }
+        playIntent=null;
 
         super.onDestroy();
     }
@@ -169,6 +170,7 @@ public class MainActivity extends AppCompatActivity {
         }
         super.onResume();
     }
+
 
     public void setDisplayMusicBottom() {
         if (musicService.isPng()) {
@@ -257,6 +259,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    // permisson android >=6.0
     private boolean checkPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             for (String check : permissions) {

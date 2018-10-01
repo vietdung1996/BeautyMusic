@@ -7,12 +7,16 @@ import android.app.Service;
 public class AppController extends Application {
     private static AppController mInstance;
     private Service musicService;
-    private Activity mainActivity;
+    private Activity playMusicActivity;
 
     @Override
     public void onCreate() {
         super.onCreate();
         mInstance = this;
+    }
+
+    public static AppController getInstance() {
+        return mInstance;
     }
 
     public Service getMusicService() {
@@ -23,15 +27,13 @@ public class AppController extends Application {
         this.musicService = musicService;
     }
 
-    public static AppController getInstance() {
-        return mInstance;
+    public Activity getPlayMucsicActivity() {
+        return playMusicActivity;
     }
 
-    public Activity getMainActivity() {
-        return mainActivity;
+    public void setPlayMusicActivity(Activity playMusicActivity) {
+        this.playMusicActivity = playMusicActivity;
     }
 
-    public void setMainActivity(Activity mainActivity) {
-        this.mainActivity = mainActivity;
-    }
+
 }
