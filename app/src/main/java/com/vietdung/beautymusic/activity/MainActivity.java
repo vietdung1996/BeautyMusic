@@ -48,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
     public static Intent playIntent;
     boolean musicBound = false;
     private String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE};
+    MusicService musicService1;
+
 
 
     private ServiceConnection musicConnection = new ServiceConnection() {
@@ -66,6 +68,9 @@ public class MainActivity extends AppCompatActivity {
                 if(musicService.isRunBackground()==true){
                     musicService.setRunBackground(false);
                 }
+                if (musicService.isCancelPlayMusic() == true) {
+                    musicService.setCancelPlayMusic(false);
+                }
             }
         }
 
@@ -80,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         if (!checkPermissions()) {
+
             return;
         }
         initView();
@@ -88,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onStart() {
+
         super.onStart();
         if (playIntent == null) {
             playIntent = new Intent(this, MusicService.class);
@@ -97,11 +104,14 @@ public class MainActivity extends AppCompatActivity {
         }else if(playIntent!=null){
            // Log.d("playintent", "onStart: ");
         }
-
-        if (musicService != null&&musicBound) {
+        if (musicService1 != null) {
+            Log.d("service onstart", "onStart: ");
             setDisplayMusicBottom();
+
         }
 
+        updateBottomControlls();
+        Log.d("service onstart 1", "onStart: ");
     }
 
     private void addEvents() {
@@ -139,6 +149,9 @@ public class MainActivity extends AppCompatActivity {
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.setTabsFromPagerAdapter(adapter);//deprecated
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
+        AppController.getInstance().setMainActivity(this);
+        musicService1 = (MusicService) AppController.getInstance().getMusicService();
+
 
 
     }
@@ -147,10 +160,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         if(musicService!=null){
             musicService.setRunBackground(true);
+            musicService.setCancelPlayMusic(true);
            // Log.d("chay vao day main", "onDestroy: ");
         }else{
             MusicService musicService1 = (MusicService) AppController.getInstance().getMusicService();
             musicService1.setRunBackground(true);
+            musicService1.setCancelPlayMusic(true);
         }
         //Log.d("service max ngu", "onDestroy: ");
         musicService=null;
@@ -159,7 +174,6 @@ public class MainActivity extends AppCompatActivity {
             musicBound = false;
         }
         playIntent=null;
-
         super.onDestroy();
     }
 
@@ -173,18 +187,54 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void setDisplayMusicBottom() {
-        if (musicService.isPng()) {
-            tv_SongBottom.setText(musicService.getNameSong());
-            tv_ArtistBottom.setText(musicService.getNameArtist());
-            seekBarBottom.setMax(musicService.getTimeTotal());
+        //final MusicService musicService1 = (MusicService) AppController.getInstance().getMusicService();
+        if (musicService != null) {
+            if (musicService.isPng()) {
+                tv_SongBottom.setText(musicService.getNameSong());
+                tv_ArtistBottom.setText(musicService.getNameArtist());
+                seekBarBottom.setMax(musicService.getTimeTotal());
+                iv_Pause.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (musicService.isPng()) {
+                            musicService.pauseSong();
+                            iv_Pause.setImageResource(R.drawable.play);
+                        } else {
+                            musicService.pauseToPlaySong();
+                            iv_Pause.setImageResource(R.drawable.pause);
+                        }
+                    }
+                });
+                seekBarBottom.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                        musicService.seekTo(seekBar.getProgress());
+                    }
+
+                });
+            }
+        } else if (musicService1 != null && musicService1.isPng()) {
+            tv_SongBottom.setText(musicService1.getNameSong());
+            tv_ArtistBottom.setText(musicService1.getNameArtist());
+            seekBarBottom.setMax(musicService1.getTimeTotal());
             iv_Pause.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if(musicService.isPng()){
-                        musicService.pauseSong();
+                    if (musicService1.isPng()) {
+                        musicService1.pauseSong();
                         iv_Pause.setImageResource(R.drawable.play);
                     }else{
-                        musicService.pauseToPlaySong();
+                        musicService1.pauseToPlaySong();
                         iv_Pause.setImageResource(R.drawable.pause);
                     }
                 }
@@ -202,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onStopTrackingTouch(SeekBar seekBar) {
-                    musicService.seekTo(seekBar.getProgress());
+                    musicService1.seekTo(seekBar.getProgress());
                 }
 
             });
@@ -276,10 +326,24 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (checkPermissions()) {
+            initView();
 
         } else {
             finish();
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    //update iv_Pause on BottomDisPlay
+    public void updateBottomControlls() {
+
+        if (musicService != null && musicBound) {
+            if (musicService.isPng()) {
+                iv_Pause.setImageResource(R.drawable.pause);
+
+            } else {
+                iv_Pause.setImageResource(R.drawable.play);
+            }
+        }
     }
 }

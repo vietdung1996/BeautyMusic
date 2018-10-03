@@ -50,6 +50,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     private boolean isRunBackground = false;
     private boolean isRestartNotifi = false;
+    private boolean isCancelPlayMusic = false;
 
     @Nullable
     @Override
@@ -353,6 +354,11 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         isRunBackground = runBackground;
     }
 
+    public boolean isCancelPlayMusic() {
+        return isCancelPlayMusic;
+    }
 
-
+    public void setCancelPlayMusic(boolean cancelPlayMusic) {
+        isCancelPlayMusic = cancelPlayMusic;
+    }
 }

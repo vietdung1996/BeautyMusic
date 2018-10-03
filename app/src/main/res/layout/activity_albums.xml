@@ -30,7 +30,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="300dp"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/music"
+                    android:src="@drawable/back_ground_album"
                     app:layout_collapseMode="parallax" />
 
                 <android.support.v7.widget.Toolbar

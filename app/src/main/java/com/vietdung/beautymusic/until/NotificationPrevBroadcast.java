@@ -12,10 +12,14 @@ public class NotificationPrevBroadcast extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         MusicService musicService = MainActivity.musicService;
         MusicService musicService1 = (MusicService) AppController.getInstance().getMusicService();
+        MainActivity mainActivity = (MainActivity) AppController.getInstance().getMainActivity();
         if(musicService!=null){
             musicService.backSong();
         }else{
             musicService1.backSong();
+        }
+        if(mainActivity!=null){
+            mainActivity.updateBottomControlls();
         }
 
     }

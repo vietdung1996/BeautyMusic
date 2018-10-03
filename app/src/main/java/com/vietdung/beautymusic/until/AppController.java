@@ -8,6 +8,7 @@ public class AppController extends Application {
     private static AppController mInstance;
     private Service musicService;
     private Activity playMusicActivity;
+    private Activity mainActivity;
 
     @Override
     public void onCreate() {
@@ -35,5 +36,11 @@ public class AppController extends Application {
         this.playMusicActivity = playMusicActivity;
     }
 
+    public Activity getMainActivity() {
+        return mainActivity;
+    }
 
+    public void setMainActivity(Activity mainActivity) {
+        this.mainActivity = mainActivity;
+    }
 }

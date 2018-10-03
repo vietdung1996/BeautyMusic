@@ -249,13 +249,15 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         setPlayingMusic();
+        tb_PlayMusic.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(),MainActivity.class));
+            }
+        });
     }
 
-    @Override
-    public boolean onSupportNavigateUp() {
-        onBackPressed();
-        return true;
-    }
+
 
     private void setPlayingMusic() {
         for (int i = 0; i < songsList.size(); i++) {
@@ -437,11 +439,7 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
         return super.onOptionsItemSelected(item);
     }
 
-    protected void onDestroy() {
-        musicService = null;
-        unbindService(musicConnection);
-        super.onDestroy();
-    }
+
 
     private List<Songs> getSampleData() {
         screen = getIntent().getIntExtra(FragmentSongAdapter.rq_itent_screen, -1);
@@ -526,6 +524,7 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
         if(musicService.isPng()){
             iv_Pause.setVisibility(View.VISIBLE);
             iv_Play.setVisibility(View.INVISIBLE);
+            animator.start();
         }
     }
 
@@ -567,10 +566,17 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
         if(musicService1!=null){
             if(musicService1.isPng()){
                 animator.resume();
+            }else{
+                animator.pause();
             }
-
-        }else{
-            animator.pause();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        musicService=null;
+        unbindService(musicConnection);
+        super.onDestroy();
+
     }
 }

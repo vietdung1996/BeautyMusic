@@ -14,6 +14,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -143,7 +146,12 @@ public class AlbumsActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         collapsingToolbarLayout.setTitle(thisTitle);
         Bitmap bitmap = BitmapFactory.decodeFile(thisArt);
-        iv_Albums.setImageBitmap(bitmap);
+        if(bitmap!=null){
+            iv_Albums.setImageBitmap(bitmap);
+        }else{
+            iv_Albums.setImageResource(R.drawable.back_ground_album);
+        }
+
     }
 
     @Override

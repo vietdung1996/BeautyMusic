@@ -15,6 +15,7 @@ import com.vietdung.beautymusic.activity.PlayMussicActivity;
 import com.vietdung.beautymusic.model.Author;
 import com.vietdung.beautymusic.model.Songs;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SongArtistsAdapter extends RecyclerView.Adapter<SongArtistsAdapter.RecyclerviewHolder> {

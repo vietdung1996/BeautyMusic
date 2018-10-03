@@ -42,7 +42,12 @@ public class FragmentAlbumsAdapter extends RecyclerView.Adapter<FragmentAlbumsAd
         holder.tvAlbumsSong.setText(albumsList.get(position).getNameAlbums());
         holder.tvAlbumsAuthorName.setText(albumsList.get(position).getNameAuthor());
         Bitmap bitmap = BitmapFactory.decodeFile(albumsList.get(position).getPathArt());
-        holder.iv_Albums.setImageBitmap(bitmap);
+        if (bitmap != null) {
+            holder.iv_Albums.setImageBitmap(bitmap);
+        } else {
+            holder.iv_Albums.setImageResource(R.drawable.beatslogo);
+        }
+
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

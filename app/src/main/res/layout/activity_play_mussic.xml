@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".activity.PlayMussicActivity"
     android:background="@drawable/music"
+
     >
 
     <android.support.v7.widget.Toolbar
@@ -17,11 +18,11 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/ivCircleMusic"
-        android:layout_width="230dp"
-        android:layout_height="230dp"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="50dp"
         app:civ_border_color="@color/colorBlack"
         app:civ_border_width="2dp"
         android:src="@drawable/beatslogo" />
