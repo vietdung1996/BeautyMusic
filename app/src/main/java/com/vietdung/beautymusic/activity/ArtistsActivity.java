@@ -23,7 +23,6 @@ import com.vietdung.beautymusic.adapter.FragmentArtirstsAdapter;
 import com.vietdung.beautymusic.adapter.SongArtistsAdapter;
 import com.vietdung.beautymusic.model.Albums;
 import com.vietdung.beautymusic.model.Songs;
-import com.vietdung.beautymusic.until.MusicService;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -88,7 +88,6 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
         initView();
 
         addEvents();
-
     }
 
     private ServiceConnection musicConnection = new ServiceConnection() {
@@ -256,8 +255,6 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
             }
         });
     }
-
-
 
     private void setPlayingMusic() {
         for (int i = 0; i < songsList.size(); i++) {
@@ -439,8 +436,6 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
         return super.onOptionsItemSelected(item);
     }
 
-
-
     private List<Songs> getSampleData() {
         screen = getIntent().getIntExtra(FragmentSongAdapter.rq_itent_screen, -1);
         getDataSdCard = new GetDataSdCard(this, screen);
@@ -536,7 +531,6 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
             setPlayingMusic();
             animator.resume();
         }
-
         if (musicService != null && !musicService.isPng()) {
            // musicService.pauseToPlaySong();
             iv_Pause.setVisibility(View.INVISIBLE);
@@ -544,10 +538,7 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
             setPlayingMusic();
             animator.pause();
         }
-
     }
-
-
 
     @Override
     protected void onStart() {
