@@ -44,11 +44,12 @@ public class AlbumsActivity extends AppCompatActivity {
     SongAlbum1Adapter songMusicAdapter;
 
 
-    int idAlbums = 0;
-    String thisTitle = "";
+    private  int idAlbums = 0;
+    private String thisTitle = "";
+    private String thisArt = "";
     String thisArtist = "";
-    String thisArt = "";
-    String thisIdAlbums = "";
+
+    //String thisIdAlbums = "";
 
 
     @Override

@@ -13,6 +13,7 @@
     <dimen name="text_size_small">14sp</dimen>
     <dimen name="text_size_medium">16sp</dimen>
     <dimen name="text_size_large">18sp</dimen>
+    <dimen name="layout_hight_300">300dp</dimen>
 
     <!-- Nofication bar button -->
     <dimen name="button_width_height">48dp</dimen>

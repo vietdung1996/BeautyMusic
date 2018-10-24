@@ -37,6 +37,7 @@ import com.vietdung.beautymusic.adapter.SongMusicAdapter;
 import com.vietdung.beautymusic.database.GetDataSdCard;
 import com.vietdung.beautymusic.model.Songs;
 import com.vietdung.beautymusic.until.AppController;
+import com.vietdung.beautymusic.until.Contanst;
 import com.vietdung.beautymusic.until.MusicService;
 
 import java.text.SimpleDateFormat;
@@ -59,21 +60,16 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
     List<Songs> songsList;
     SongMusicAdapter songAdapter;
     RecyclerView rv_Song;
-    int id = 0;
+    private int id = 0;
     MusicService musicService;
     Intent playIntent;
     boolean musicBound = false;
-    int position = 0;
-    int screen;
+    private int position = 0;
+    private int screen;
 
     GetDataSdCard getDataSdCard;
-    private SharedPreferences sharedPreferences;
-    public static final String LIST_OF_SORTED_DATA_ID = "json_list_sorted_data_id";
-    public final static String PREFERENCE_FILE = "preference_file";
-    public final static String rq_notification = "2000";
-    public final static String rq_screen = "screen";
-    public final static String rq_screen_idalbums = "screen_idalbums";
-    public final static String rq_screen_idartist = "screen_idartist";
+    SharedPreferences sharedPreferences;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,7 +119,7 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
 
     public void songPicked() {
         int rq_notifi=0;
-        rq_notifi = getIntent().getIntExtra(rq_notification,0);
+        rq_notifi = getIntent().getIntExtra(Contanst.rq_notification,0);
         if(rq_notifi!=3000){
             musicService.setSong(position);
             musicService.playSong();
@@ -192,7 +188,7 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
             @Override
             public void onClick(View view) {
                 boolean repeat=musicService.setRepeat();
-                if(repeat==true){
+                if(repeat){
                     iv_Repeat.setImageResource(R.drawable.repeatcolor);
 
                 }else{
@@ -422,13 +418,13 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
             // start intent Playing Queue
             case R.id.mnPlayQueue:
                 Intent intent = new Intent(this, PlayingQueueActivity.class);
-                intent.putExtra(rq_screen, screen);
+                intent.putExtra(Contanst.rq_screen, screen);
                 if (screen == 123) {
                     int idAlbums = getIntent().getIntExtra(SongAlbum1Adapter.rq_itent_album, -1);
-                    intent.putExtra(rq_screen_idalbums, idAlbums);
+                    intent.putExtra(Contanst.rq_screen_idalbums, idAlbums);
                 } else if (screen == 321) {
                     int idArtist = getIntent().getIntExtra(SongArtistsAdapter.rq_itent_album, -1);
-                    intent.putExtra(rq_screen_idartist, idArtist);
+                    intent.putExtra(Contanst.rq_screen_idartist, idArtist);
                 }
                 startActivity(intent);
                 break;
@@ -444,7 +440,7 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
         //create an empty array to hold the list of sorted Customers
         List<Songs> sortedSongs = new ArrayList<Songs>();
         //get the JSON array of the ordered of sorted customers
-        String jsonListOfSortedCustomerId = sharedPreferences.getString(LIST_OF_SORTED_DATA_ID, "");
+        String jsonListOfSortedCustomerId = sharedPreferences.getString(Contanst.LIST_OF_SORTED_DATA_ID, "");
         //check for null
         if (!jsonListOfSortedCustomerId.isEmpty()) {
             //convert JSON array into a List<Long>
@@ -499,7 +495,7 @@ public class PlayMussicActivity extends AppCompatActivity implements SongMusicAd
         animator.setInterpolator(new LinearInterpolator());
         animator.start();
 
-        sharedPreferences = this.getApplicationContext().getSharedPreferences(PREFERENCE_FILE, Context.MODE_PRIVATE);
+        sharedPreferences = this.getApplicationContext().getSharedPreferences(Contanst.PREFERENCE_FILE, Context.MODE_PRIVATE);
 
         songsList = getSampleData();
         songAdapter = new SongMusicAdapter(songsList, this);

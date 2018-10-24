@@ -33,7 +33,7 @@ public class FragmentArtists extends Fragment {
     RecyclerView rv_Author;
     List<Author> authorList;
     FragmentArtirstsAdapter authorAdapter;
-    int numberofColumns = 2;
+    private int numberofColumns = 2;
 
     @Nullable
     @Override

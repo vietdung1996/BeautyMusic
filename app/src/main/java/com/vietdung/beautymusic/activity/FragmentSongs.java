@@ -31,7 +31,7 @@ public class FragmentSongs extends Fragment  {
     RecyclerView rv_Songs;
     List<Songs> songsList;
     FragmentSongAdapter songAdapter;
-    int numberofColumns = 2;
+    private int numberofColumns = 2;
 
     @Nullable
     @Override

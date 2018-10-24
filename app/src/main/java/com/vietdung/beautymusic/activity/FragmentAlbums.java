@@ -32,7 +32,7 @@ public class FragmentAlbums extends Fragment {
     RecyclerView rv_Albums;
     List<Albums> albumsList;
     FragmentAlbumsAdapter albumsAdapter;
-    int numberofColumns = 2;
+    private int numberofColumns = 2;
 
     @Nullable
     @Override

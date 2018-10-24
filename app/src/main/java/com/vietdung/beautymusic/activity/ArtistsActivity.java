@@ -39,8 +39,8 @@ public class ArtistsActivity extends AppCompatActivity {
     List<Albums> albumsList;
     SongArtistsAdapter songArtistsAdapter;
 
-    int idArtist = 0;
-    String thisTitle = "";
+    private int idArtist = 0;
+    private String thisTitle = "";
 
 
 

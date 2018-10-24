@@ -265,7 +265,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         Intent i = new Intent(getApplicationContext(), PlayMussicActivity.class);
         i.putExtra(FragmentSongAdapter.rq_itent_position, position);
-        i.putExtra(PlayMussicActivity.rq_notification,3000);
+        i.putExtra(Contanst.rq_notification,3000);
         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
 

@@ -20,6 +20,7 @@ import com.vietdung.beautymusic.model.Songs;
 import com.vietdung.beautymusic.presenter.ItemTouchListenner;
 import com.vietdung.beautymusic.presenter.SimpleItemTouchHelperCallback;
 import com.vietdung.beautymusic.presenter.called_listener.OnCustomerListChangedListener;
+import com.vietdung.beautymusic.until.Contanst;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +36,7 @@ public class PlayingQueueActivity extends AppCompatActivity implements OnCustome
     GetDataSdCard getDataSdCard;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
-    public static final String LIST_OF_SORTED_DATA_ID = "json_list_sorted_data_id";
-    public final static String PREFERENCE_FILE = "preference_file";
+
 
 
 
@@ -99,7 +99,7 @@ public class PlayingQueueActivity extends AppCompatActivity implements OnCustome
         LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         rv_Playing.setLayoutManager(layoutManager);
-        sharedPreferences = this.getApplicationContext().getSharedPreferences(PREFERENCE_FILE, Context.MODE_PRIVATE);
+        sharedPreferences = this.getApplicationContext().getSharedPreferences(Contanst.PREFERENCE_FILE, Context.MODE_PRIVATE);
         editor =sharedPreferences.edit();
         songsList = getSampleData();
         songPlayingQueueAdapter = new SongPlayingQueueAdapter(songsList, this,this);
@@ -117,20 +117,20 @@ public class PlayingQueueActivity extends AppCompatActivity implements OnCustome
         Gson gson = new Gson();
         String jsonListOfSortedCustomerIds = gson.toJson(listOfSortedSongId);
         //save to SharedPreference
-        editor.putString(LIST_OF_SORTED_DATA_ID, jsonListOfSortedCustomerIds).commit();
+        editor.putString(Contanst.LIST_OF_SORTED_DATA_ID, jsonListOfSortedCustomerIds).commit();
         editor.commit();
 
     }
 
     private List<Songs> getSampleData(){
-        int screen = getIntent().getIntExtra(PlayMussicActivity.rq_screen, 0);
+        int screen = getIntent().getIntExtra(Contanst.rq_screen, 0);
         getDataSdCard = new GetDataSdCard(this, screen);
         //Get the song data
         List<Songs> songsList = getDataSdCard.getData() ;
         //create an empty array to hold the list of sorted Customers
         List<Songs> sortedSongs= new ArrayList<Songs>();
         //get the JSON array of the ordered of sorted customers
-        String jsonListOfSortedCustomerId = sharedPreferences.getString(LIST_OF_SORTED_DATA_ID, "");
+        String jsonListOfSortedCustomerId = sharedPreferences.getString(Contanst.LIST_OF_SORTED_DATA_ID, "");
 
 
         //check for null

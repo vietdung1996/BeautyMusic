@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".activity.PlayMussicActivity"
     android:background="@drawable/music"
-
     >
 
     <android.support.v7.widget.Toolbar
