@@ -88,6 +88,8 @@ public class MainActivity extends AppCompatActivity {
 
             return;
         }
+        initView();
+        addEvents();
     }
 
     @Override
