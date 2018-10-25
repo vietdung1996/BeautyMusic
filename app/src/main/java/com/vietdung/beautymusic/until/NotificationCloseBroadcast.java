@@ -16,7 +16,6 @@ public class NotificationCloseBroadcast extends BroadcastReceiver {
            musicService.cancelNotification();
        }else{
            musicService1.cancelNotification();
-
        }
     }
 }

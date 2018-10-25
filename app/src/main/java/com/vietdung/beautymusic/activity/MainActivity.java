@@ -88,8 +88,6 @@ public class MainActivity extends AppCompatActivity {
 
             return;
         }
-        initView();
-        addEvents();
     }
 
     @Override
@@ -327,7 +325,7 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (checkPermissions()) {
             initView();
-
+            addEvents();
         } else {
             finish();
         }
@@ -336,7 +334,6 @@ public class MainActivity extends AppCompatActivity {
 
     //update iv_Pause on BottomDisPlay
     public void updateBottomControlls() {
-
         if (musicService != null && musicBound) {
             if (musicService.isPng()) {
                 iv_Pause.setImageResource(R.drawable.pause);
